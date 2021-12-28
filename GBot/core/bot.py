@@ -14,4 +14,3 @@ class GeneralBotCore(Bot):
 
     async def run(self):
         await self.start(self.token)
-
