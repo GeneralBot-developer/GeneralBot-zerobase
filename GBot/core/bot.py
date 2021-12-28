@@ -13,4 +13,4 @@ class GeneralBotCore(Bot):
         self.LOG.INFO(f"Logger in {self.name}")
 
     def run(self):
-        super(GeneralBotCore, self).start(self.token)
+        self.start(self.token)
