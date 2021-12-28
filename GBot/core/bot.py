@@ -13,7 +13,7 @@ class GeneralBotCore(Bot):
         super().__init__(command_prefix="!")
 
     async def on_ready(self):
-        LOG.info(f"Logger in {self.name}")
+        LOG.info(f"Logger in {self.user}")
 
     # 起動用の補助関数です
     def run(self):
