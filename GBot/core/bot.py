@@ -8,9 +8,11 @@ LOG = getLogger(__name__)
 
 
 class GeneralBotCore(Bot):
-    def __init__(self, token):
+    def __init__(self, *, prefix, token, jishaku=True):
         self.token = token
-        super().__init__(command_prefix="!")
+        super().__init__(command_prefix=prefix)
+        if jishaku:
+            super().load_extension("jishaku")
 
     async def on_ready(self):
         LOG.info(f"Logger in {self.user}")
