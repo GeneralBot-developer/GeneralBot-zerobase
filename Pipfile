@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 nextcord = {extras = ["voice"], git = "https://github.com/nextcord/nextcord"}
+jishaku = "*"
 
 [dev-packages]
 flake8 = "*"
