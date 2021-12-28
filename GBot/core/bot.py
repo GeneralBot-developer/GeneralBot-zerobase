@@ -12,5 +12,6 @@ class GeneralBotCore(Bot):
     async def on_ready(self):
         self.LOG.INFO(f"Logger in {self.name}")
 
-    def run(self):
+    async def run(self):
         await self.start(self.token)
+
