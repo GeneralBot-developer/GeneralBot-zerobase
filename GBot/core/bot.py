@@ -3,10 +3,11 @@ from logging import getLogger, basicConfig, INFO
 import nextcord
 import traceback
 
+
 class GeneralBotCore(Bot):
     def __init__(self, token):
         self.token = token
-        super().__init__(command_prefix=None)
+        super().__init__(command_prefix="!")
         self.LOG = getLogger(__name__)
         basicConfig(level=INFO)
 
@@ -22,5 +23,5 @@ class GeneralBotCore(Bot):
         except KeyboardInterrupt:
             print("終了します")
             self.loop.run_until_complete(self.logout())
-        except:
+        except Exception:
             traceback.print_exc()
