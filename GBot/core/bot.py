@@ -3,16 +3,17 @@ from logging import getLogger, basicConfig, INFO
 import nextcord
 import traceback
 
+basicConfig(level=INFO)
+LOG = getLogger(__name__)
+
 
 class GeneralBotCore(Bot):
     def __init__(self, token):
         self.token = token
         super().__init__(command_prefix="!")
-        self.LOG = getLogger(__name__)
-        basicConfig(level=INFO)
 
     async def on_ready(self):
-        self.LOG.INFO(f"Logger in {self.name}")
+        LOG.info(f"Logger in {self.name}")
 
     # 起動用の補助関数です
     def run(self):
