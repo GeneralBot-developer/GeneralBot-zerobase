@@ -1,11 +1,11 @@
 from GBot.models import model
-from GBot.db import DB
+from GBot.db import DataBaseEntryPoint
 
 
 class CRUDBase:
     @staticmethod
     def execute(query, *args, **kwargs):
-        with DB() as db:
+        with DataBaseEntryPoint() as db:
             result = db.execute(query, *args, **kwargs)
         return result
 
