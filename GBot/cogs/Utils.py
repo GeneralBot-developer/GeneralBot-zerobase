@@ -1,12 +1,11 @@
 import os
 import sys
 
-import nextcord
 from GBot.models.guild import Guild
 
 from nextcord.ext.commands import (
     Cog, command, group,
-    has_permissions, is_owner
+    has_permissions, is_owner, Context
 )
 from nextcord.ext.commands.errors import (
     MissingPermissions,
@@ -25,7 +24,7 @@ class BotUtility(Cog):
 
     @command()
     @has_permissions(administrator=True)
-    async def prefix(self, ctx: nextcord.Context, *, prefix: str):
+    async def prefix(self, ctx: Context, *, prefix: str):
         if len(prefix) > 8:
             return await ctx.reply("prefixは8文字以内で設定してください。")
         guild = Guild(ctx.guild.id).get()
@@ -33,7 +32,7 @@ class BotUtility(Cog):
         await ctx.reply(f"{guild.prefix}から{prefix}に変更しました。")
 
     @prefix.error
-    async def on_prefix_error(self, ctx: nextcord.Context, error):
+    async def on_prefix_error(self, ctx: Context, error):
         if isinstance(error, MissingPermissions):
             return await ctx.send('管理者のみが実行可能です')
         if isinstance(error, MissingRequiredArgument):
