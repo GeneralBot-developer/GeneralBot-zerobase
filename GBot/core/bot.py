@@ -1,7 +1,10 @@
-from nextcord.ext.commands import Bot
-from logging import getLogger, basicConfig, INFO
-import nextcord
 import traceback
+from logging import INFO, basicConfig, getLogger
+
+import nextcord
+from nextcord.ext.commands import Bot
+
+from GBot.models.guild import Guild
 
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
@@ -9,6 +12,8 @@ LOG = getLogger(__name__)
 
 class GeneralBotCore(Bot):
     def __init__(self, *, prefix, token, jishaku=True):
+        intents = nextcord.Intents.default()
+        intents.members = True
         self.token = token
         super().__init__(command_prefix=prefix)
         if jishaku:
@@ -24,6 +29,25 @@ class GeneralBotCore(Bot):
 
     async def on_ready(self):
         LOG.info(f"Logger in {self.user}")
+
+    async def get_prefix(self, message: nextcord.Message):
+        guild = Guild(message.guild.id).get()
+        if guild:
+            print("サーバー:", message.guild.name)
+            print("接頭文字:", guild.prefix)
+            return guild.prefix
+        else:
+            guild = await Guild.create(message.guild.id)
+            guild = await guild.get()
+            print("サーバー:", message.guild.name)
+            print("接頭文字:", guild.prefix)
+            return guild.prefix
+
+    async def on_guild_join(self, guild: nextcord.Guild):
+        guild = Guild.create(guild.id)
+        guild = guild.get()
+        print("サーバー:", guild.name)
+        print("接頭文字:", guild.prefix)
 
     # 起動用の補助関数です
     def run(self):
