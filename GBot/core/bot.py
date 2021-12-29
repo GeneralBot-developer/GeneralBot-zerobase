@@ -13,6 +13,14 @@ class GeneralBotCore(Bot):
         super().__init__(command_prefix=prefix)
         if jishaku:
             super().load_extension("jishaku")
+        self.load_cogs()
+
+    def load_cogs(self):
+        cog_files = ["Utils"]
+        for cog in cog_files:
+            self.load_extension(f"GBot.cogs.{cog}")
+            LOG.info(f"{cog}のロード完了。")
+        LOG.info("全ファイルが正常に読み込まれました。")
 
     async def on_ready(self):
         LOG.info(f"Logger in {self.user}")
