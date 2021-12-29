@@ -29,5 +29,5 @@ class BotUtility(Cog):
             *sys.argv
         )
 
-    def setup(bot):
-        bot.add_cog(BotUtility(bot))
+def setup(bot):
+    bot.add_cog(BotUtility(bot))
