@@ -1,6 +1,8 @@
 import traceback
 from logging import INFO, basicConfig, getLogger
 
+import sys
+sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
 import nextcord
 from nextcord.ext.commands import Bot
 
@@ -31,7 +33,7 @@ class GeneralBotCore(Bot):
         LOG.info(f"Logger in {self.user}")
 
     async def get_prefix(self, message: nextcord.Message):
-        guild = Guild(message.guild.id).get()
+        guild = await Guild(message.guild.id).get()
         if guild:
             print("サーバー:", message.guild.name)
             print("接頭文字:", guild.prefix)
@@ -44,8 +46,8 @@ class GeneralBotCore(Bot):
             return guild.prefix
 
     async def on_guild_join(self, guild: nextcord.Guild):
-        guild = Guild.create(guild.id)
-        guild = guild.get()
+        guild = await Guild.create(guild.id)
+        guild = await guild.get()
         print("サーバー:", guild.name)
         print("接頭文字:", guild.prefix)
 
@@ -57,6 +59,6 @@ class GeneralBotCore(Bot):
             print("Discord Tokenが不正です")
         except KeyboardInterrupt:
             print("終了します")
-            self.loop.run_until_complete(self.logout())
+            self.loop.run_until_complete(self.close())
         except Exception:
             traceback.print_exc()

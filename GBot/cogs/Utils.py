@@ -22,14 +22,14 @@ class BotUtility(Cog):
         async with ctx.typing():
             await ctx.reply(f"Pong! {round(self.bot.latency * 1000)}ms.")
 
-    @command()
+    @command(ignore_extra=False)
     @has_permissions(administrator=True)
     async def prefix(self, ctx: Context, *, prefix: str):
         if len(prefix) > 8:
-            return await ctx.reply("prefixは8文字以内で設定してください。")
-        guild = Guild(ctx.guild.id).get()
-        Guild(ctx.guild.id).set(prefix=prefix)
-        await ctx.reply(f"{guild.prefix}から{prefix}に変更しました。")
+            return await ctx.send("Prefixは8文字以内である必要があります")
+        guild = await Guild(ctx.guild.id).get()
+        await Guild(ctx.guild.id).set(prefix=prefix)
+        await ctx.send(f"Prefixを{guild.prefix}から{prefix}に変更しました")
 
     @prefix.error
     async def on_prefix_error(self, ctx: Context, error):
