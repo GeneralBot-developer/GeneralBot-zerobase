@@ -14,6 +14,7 @@ LOG = getLogger(__name__)
 
 class GeneralBotCore(Bot):
     def __init__(self, *, prefix, token, jishaku=True, sanic=False, _intents):
+        super().__init__()
         self.token = token
         self.prefix = prefix
         self.jishaku = jishaku
