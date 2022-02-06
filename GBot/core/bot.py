@@ -72,7 +72,7 @@ class GeneralBotCore(Bot):
     async def setup_discordbot(self, app, loop):
         super().__init__(
             command_prefix=self.prefix,
-            intents=self.intents,
+            intents=self._intents,
             loop=loop
             )
         if self.jishaku:
