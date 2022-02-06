@@ -13,11 +13,11 @@ LOG = getLogger(__name__)
 
 
 class GeneralBotCore(Bot):
-    def __init__(self, *, prefix, token, jishaku=True, sanic=False, intents):
+    def __init__(self, *, prefix, token, jishaku=True, sanic=False, _intents):
         self.token = token
         self.prefix = prefix
         self.jishaku = jishaku
-        self.intents = intents
+        self.intents = _intents
         self.sanic = sanic
         if sanic:
             self.app = Sanic(name="GeneralBot")
