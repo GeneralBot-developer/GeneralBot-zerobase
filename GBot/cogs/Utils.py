@@ -11,10 +11,11 @@ from nextcord.ext.commands.errors import (
     MissingPermissions,
     MissingRequiredArgument
 )
+from GBot.core import GeneralBotCore
 
 
 class BotUtility(Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: GeneralBotCore):
         self.bot = bot
 
     @command()
@@ -40,21 +41,16 @@ class BotUtility(Cog):
         raise error
 
     @is_owner()
-    @group()
-    async def moding(self, ctx):
+    @group(aliases=["mod", "dev", "develop"])
+    async def moderation(self, ctx):
         if ctx.invoked_subcommand is None:
             return
 
-    @moding.command()
     @is_owner()
-    async def reboot(self, ctx):
-        await ctx.reply("rebooting...")
-        python = sys.executable
-        os.execl(
-            python,
-            python,
-            *sys.argv
-        )
+    @moderation.command()
+    async def restart(self, ctx):
+        await ctx.send("Restarting...")
+        os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 def setup(bot):
