@@ -1,14 +1,13 @@
 from logging import INFO, basicConfig, getLogger
 
 import sys
-sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
-import nextcord
-from nextcord.ext.commands import Bot
 
 from GBot.models.guild import Guild
 from sanic import Sanic
 from sanic.response import text
-import aiohttp
+sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
+import nextcord
+from nextcord.ext.commands import Bot
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
 
@@ -16,11 +15,10 @@ LOG = getLogger(__name__)
 class GeneralBotCore(Bot):
     def __init__(self, *, prefix, token, jishaku=True, sanic=False, intents):
         self.token = token
+        self.prefix = prefix
+        self.jishaku = jishaku
+        self.intents = intents
         self.sanic = sanic
-        super().__init__(command_prefix=prefix, intents=intents)
-        if jishaku:
-            super().load_extension("jishaku")
-        self.load_cogs()
         if sanic:
             self.app = Sanic(name="GeneralBot")
             self.app.register_listener(
@@ -32,6 +30,7 @@ class GeneralBotCore(Bot):
                 "before_server_stop"
             )
             self.app.add_route(self.keep_alive, '/')
+            self.load_cogs()
 
     async def keep_alive(self, request):
         return text("Bot is alive")
@@ -71,6 +70,13 @@ class GeneralBotCore(Bot):
 
     # 起動用の補助関数です
     async def setup_discordbot(self, app, loop):
+        super().__init__(
+            command_prefix=self.prefix,
+            intents=self.intents,
+            loop=loop
+            )
+        if self.jishaku:
+            self.load_extension("jishaku")
         loop.create_task(self.start(self.token))
 
     async def setout_discordbot(self, app, loop):
