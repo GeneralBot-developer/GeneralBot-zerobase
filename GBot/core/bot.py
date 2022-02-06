@@ -49,24 +49,25 @@ class GeneralBotCore(Bot):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
-                print("サーバー:", guild.name)
-                print("接頭文字:", guild.prefix)
+                print(f"サーバー:{guild.name}")
+                print(f"接頭文字:{guild.prefix}")
                 return "gc!"
             else:
-                print("サーバー:", guild.name)
-                print("接頭文字:", guild.prefix)
+                print(f"サーバー:{guild.name}")
+                print(f"接頭文字:{guild.prefix}")
                 return guild.prefix
         else:
+            LOG.info("該当するサーバーがなかったので新たに作成します。")
             guild = await Guild.create(message.guild.id)
             guild = await guild.get()
-            print("サーバー:", guild.name)
-            print("接頭文字:", guild.prefix)
+                print(f"サーバー:{guild.name}")
+                print(f"接頭文字:{guild.prefix}")
 
     async def on_guild_join(self, guild: nextcord.Guild):
         guild = await Guild.create(guild.id)
         guild = await guild.get()
-        print("サーバー:", guild.name)
-        print("接頭文字:", guild.prefix)
+        print(f"サーバー:{guild.name}")
+        print(f"接頭文字:{guild.prefix}")
 
     # 起動用の補助関数です
     async def setup_discordbot(self, app, loop):
