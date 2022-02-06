@@ -17,7 +17,7 @@ class GeneralBotCore(Bot):
         self.token = token
         self.prefix = prefix
         self.jishaku = jishaku
-        self.intents = _intents
+        self._intents = _intents
         self.sanic = sanic
         if sanic:
             self.app = Sanic(name="GeneralBot")
