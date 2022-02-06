@@ -60,8 +60,8 @@ class GeneralBotCore(Bot):
             LOG.info("該当するサーバーがなかったので新たに作成します。")
             guild = await Guild.create(message.guild.id)
             guild = await guild.get()
-                print(f"サーバー:{guild.name}")
-                print(f"接頭文字:{guild.prefix}")
+            print(f"サーバー:{guild.name}")
+            print(f"接頭文字:{guild.prefix}")
 
     async def on_guild_join(self, guild: nextcord.Guild):
         guild = await Guild.create(guild.id)
