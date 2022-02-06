@@ -76,7 +76,7 @@ class GeneralBotCore(Bot):
             loop=loop
             )
         if self.jishaku:
-            self.load_extension("jishaku")
+            super().load_extension("jishaku")
         loop.create_task(self.start(self.token))
 
     async def setout_discordbot(self, app, loop):
