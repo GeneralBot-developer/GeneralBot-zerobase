@@ -30,7 +30,6 @@ class GeneralBotCore(Bot):
                 "before_server_stop"
             )
             self.app.add_route(self.keep_alive, '/')
-            self.load_cogs()
 
     async def keep_alive(self, request):
         return text("Bot is alive")
@@ -77,6 +76,7 @@ class GeneralBotCore(Bot):
             )
         if self.jishaku:
             super().load_extension("jishaku")
+        self.load_cogs()
         loop.create_task(self.start(self.token))
 
     async def setout_discordbot(self, app, loop):
