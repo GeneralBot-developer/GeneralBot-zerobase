@@ -8,7 +8,7 @@ bot = GeneralBotCore(
     prefix=None,
     token=os.environ["BOT_TOKEN"],
     jishaku=True,
-    intents=nextcord.Intents.all(),
+    _intents=nextcord.Intents.all(),
     sanic=True
 )
 bot.owner_ids = [484655503675228171, 693025129806037003, 898929156048441386]
