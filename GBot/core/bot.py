@@ -38,7 +38,7 @@ class GeneralBotCore(Bot):
     def load_cogs(self):
         cog_files = ["Utils", "RoleKeeper", "screenshot"]
         for cog in cog_files:
-            self.load_extension(f"GBot.cogs.{cog}")
+            super().load_extension(f"GBot.cogs.{cog}")
             LOG.info(f"{cog}のロード完了。")
         LOG.info("全ファイルが正常に読み込まれました。")
 
