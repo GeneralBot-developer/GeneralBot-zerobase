@@ -32,15 +32,6 @@ class GeneralBotCore(Bot):
                 "before_server_stop"
             )
             self.app.add_route(self.keep_alive, '/')
-            self.session = aiohttp.ClientSession(
-                headers={
-                    'User-Agent': 'GeneralBot: kousakirai; aiohttp on Python 3.8.10;'
-                    },
-                skip_auto_headers=[
-                    'User-Agent'
-                    ],
-                loop=self.loop
-                )
 
     async def keep_alive(self, request):
         return text("Bot is alive")
