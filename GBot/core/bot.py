@@ -57,20 +57,20 @@ class GeneralBotCore(Bot):
 
     async def get_prefix(self, message: nextcord.Message):
         guild = await Guild(message.guild.id).get()
-        if guild.id == 878265923709075486:
-            print("サーバー:", message.guild.name)
-            print("接頭文字:", "gc!")
-            return "gc!"
         if guild:
-            print("サーバー:", message.guild.name)
-            print("接頭文字:", guild.prefix)
-            return guild.prefix
+            if guild.id == 878265923709075486:
+                print("サーバー:", guild.name)
+                print("接頭文字:", guild.prefix)
+                return "gc!"
+            else:
+                print("サーバー:", guild.name)
+                print("接頭文字:", guild.prefix)
+                return guild.prefix
         else:
             guild = await Guild.create(message.guild.id)
             guild = await guild.get()
-            print("サーバー:", message.guild.name)
+            print("サーバー:", guild.name)
             print("接頭文字:", guild.prefix)
-            return guild.prefix
 
     async def on_guild_join(self, guild: nextcord.Guild):
         guild = await Guild.create(guild.id)
