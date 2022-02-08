@@ -8,9 +8,9 @@ class DataBaseEntryPoint:
         if loop is None:
             loop = asyncio.get_event_loop()
         engine = await create_engine(
-            user=os.environ["MYSQL_USER"],
-            db=os.environ["MYSQL_DATABASE"],
-            host="remotemysql.com",
+            user=os.environ["DB_USER"],
+            db=os.environ["DB_USER"],
+            host=os.environ["DB_HOST"],
             port=3306,
             password=os.environ["MYSQL_PASSWORD"],
             charset="utf8",
