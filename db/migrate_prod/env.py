@@ -13,7 +13,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODELS_ROOT = BASE_DIR + '/GBot/models'
+MODELS_ROOT = BASE_DIR + '/../GBot/models/model'
 sys.path.append(MODELS_ROOT)
 
 target_models = [

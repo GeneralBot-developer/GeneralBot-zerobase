@@ -2,7 +2,7 @@ from logging import INFO, basicConfig, getLogger
 
 import sys
 
-from GBot.models.guild import Guild
+from GBot.CRUD.guild import Guild
 from sanic import Sanic
 from sanic.response import text
 sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")

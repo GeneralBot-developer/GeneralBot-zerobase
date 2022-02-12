@@ -1,7 +1,7 @@
 import os
 import sys
 
-from GBot.models.guild import Guild
+from GBot.CRUD.guild import Guild
 
 from nextcord.ext.commands import (
     Cog, command, group,

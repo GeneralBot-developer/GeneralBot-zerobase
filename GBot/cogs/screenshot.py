@@ -1,7 +1,6 @@
 from nextcord.ext.commands import Cog, command, Context
 from GBot.core import GeneralBotCore
 from nextcord import File
-import asyncio
 from pyppeteer import launch
 
 
