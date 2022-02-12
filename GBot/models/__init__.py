@@ -1,1 +1,1 @@
-import .model
+import GBot.models.guild as guild

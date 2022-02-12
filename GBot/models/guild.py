@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, MetaData, BigInteger, JSON
+from sqlalchemy import Table, Column, String, MetaData, BigInteger
 from sqlalchemy.ext.declarative import declarative_base
 
 meta = MetaData()

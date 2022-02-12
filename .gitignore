@@ -128,4 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-alembic/postresql/versions/*.py
+versions/*.py

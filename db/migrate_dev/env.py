@@ -13,9 +13,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-print(BASE_DIR)
-MODELS_ROOT = BASE_DIR + '/../GBot/models/model'
-print(MODELS_ROOT)
+MODELS_ROOT = BASE_DIR + '/../GBot/models'
 sys.path.append(MODELS_ROOT)
 
 target_models = [
@@ -26,12 +24,12 @@ target_models = [
 class BaseEnv:
     @staticmethod
     def make_target_metadata():
-        print(os.getcwd())
         lst = list(
             map(
                 lambda x: importlib.import_module(
-                    f"GBot.models.model.{x}"
-                    ).Base.metadata, target_models
+                    x
+                    ).Base.metadata,
+                target_models
                 )
             )
         m = MetaData()
