@@ -1,7 +1,6 @@
 #!/bin/sh
 #code1
 set -eu
-pip install pipenv
 pipenv install
 python -m pip install python-dotenv
 python -m pip install alembic
