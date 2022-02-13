@@ -43,6 +43,7 @@ chromedriver = "*"
 webdriver-manager = "*"
 pyppeteer = "*"
 youtube-dl = "*"
+lark = "*"
 
 [dev-packages]
 flake8 = "*"

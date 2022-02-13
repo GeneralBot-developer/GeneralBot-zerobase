@@ -1,0 +1,6 @@
+expr := <term> <expr'>
+expr' := + <term> <expr'> | - <term> <expr'> | eps
+term := <factor> <term'>
+term' := * <factor> <term'> | / <factor> <term'> | eps
+factor := (<expr>) | <number>
+number := [0 - 9]*
