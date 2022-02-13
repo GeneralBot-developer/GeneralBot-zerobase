@@ -48,7 +48,13 @@ class GeneralBotCore(Bot):
         return await super().is_owner(user)
 
     def load_cogs(self):
-        cog_files = ["Utils", "RoleKeeper", "screenshot", "music_player"]
+        cog_files = [
+            "Utils",
+            "RoleKeeper",
+            "screenshot",
+            "music_player",
+            "Calculation"
+            ]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")
             LOG.info(f"{cog}のロード完了。")
@@ -61,9 +67,14 @@ class GeneralBotCore(Bot):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
-                print(f"サーバー:{message.guild.name}")
-                print(f"接頭文字:{guild.prefix}")
-                return "gc!"
+                if self.user.id == 484655503675228171:
+                    print(f"サーバー:{message.guild.name}")
+                    print(f"接頭文字:{guild.prefix}")
+                    return "gc!"
+                else:
+                    print(f"サーバー:{message.guild.name}")
+                    print(f"接頭文字:{guild.prefix}")
+                    return guild.prefix
             else:
                 print(f"サーバー:{message.guild.name}")
                 print(f"接頭文字:{guild.prefix}")
