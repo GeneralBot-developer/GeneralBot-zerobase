@@ -2,6 +2,7 @@ from nextcord.ext import commands
 
 DEBUG = False
 
+
 char_dct = {
     "1", "2", "3", "4", "5",
     "6", "7", "8", "9", "0",
@@ -74,7 +75,6 @@ def number(line):
         return float(tmp)
     else:
         return int(tmp)
-
 
 class Calculation(commands.Cog):
     def __init__(self, bot):

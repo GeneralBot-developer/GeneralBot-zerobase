@@ -67,9 +67,14 @@ class GeneralBotCore(Bot):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
-                print(f"サーバー:{message.guild.name}")
-                print(f"接頭文字:{guild.prefix}")
-                return "gc!"
+                if self.user.id == 484655503675228171:
+                    print(f"サーバー:{message.guild.name}")
+                    print(f"接頭文字:{guild.prefix}")
+                    return "gc!"
+                else:
+                    print(f"サーバー:{message.guild.name}")
+                    print(f"接頭文字:{guild.prefix}")
+                    return guild.prefix
             else:
                 print(f"サーバー:{message.guild.name}")
                 print(f"接頭文字:{guild.prefix}")
