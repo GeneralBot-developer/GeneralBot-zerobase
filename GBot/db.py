@@ -12,7 +12,7 @@ class DataBaseEntryPoint:
             db=os.environ["DB_USER"],
             host=os.environ["DB_HOST"],
             port=3306,
-            password=os.environ["MYSQL_PASSWORD"],
+            password=os.environ["DB_PASSWORD"],
             charset="utf8",
             autocommit=True,
             loop=loop

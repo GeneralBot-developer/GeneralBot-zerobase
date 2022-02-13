@@ -42,6 +42,7 @@ aiofile = "*"
 chromedriver = "*"
 webdriver-manager = "*"
 pyppeteer = "*"
+youtube-dl = "*"
 
 [dev-packages]
 flake8 = "*"

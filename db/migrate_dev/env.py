@@ -28,7 +28,7 @@ class BaseEnv:
             map(
                 lambda x: importlib.import_module(
                     x
-                    ).Base.metadata,
+                    ).meta,
                 target_models
                 )
             )

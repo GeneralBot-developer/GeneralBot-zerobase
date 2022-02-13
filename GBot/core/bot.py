@@ -11,6 +11,13 @@ from nextcord.ext.commands import Bot
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
 
+team_id = [
+    757106917947605034,
+    705264675138568192,
+    743455582517854239,
+    910588052102086728,
+    484655503675228171
+    ]
 
 class GeneralBotCore(Bot):
     def __init__(self, *, prefix, token, jishaku=True, sanic=False, _intents):
@@ -35,8 +42,13 @@ class GeneralBotCore(Bot):
     async def keep_alive(self, request):
         return text("Bot is alive")
 
+    async def is_owner(self, user: nextcord.User):
+        if user.id in team_id:
+            return True
+        return await super().is_owner(user)
+
     def load_cogs(self):
-        cog_files = ["Utils", "RoleKeeper", "screenshot"]
+        cog_files = ["Utils", "RoleKeeper", "screenshot", "music_player"]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")
             LOG.info(f"{cog}のロード完了。")
@@ -49,25 +61,25 @@ class GeneralBotCore(Bot):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
-                print(f"サーバー:{guild.name}")
+                print(f"サーバー:{message.guild.name}")
                 print(f"接頭文字:{guild.prefix}")
                 return "gc!"
             else:
-                print(f"サーバー:{guild.name}")
+                print(f"サーバー:{message.guild.name}")
                 print(f"接頭文字:{guild.prefix}")
                 return guild.prefix
         else:
             LOG.info("該当するサーバーがなかったので新たに作成します。")
             guild = await Guild.create(message.guild.id)
             guild = await guild.get()
-            print(f"サーバー:{guild.name}")
+            print(f"サーバー:{message.guild.name}")
             print(f"接頭文字:{guild.prefix}")
 
     async def on_guild_join(self, guild: nextcord.Guild):
-        guild = await Guild.create(guild.id)
-        guild = await guild.get()
+        db_guild = await Guild.create(guild.id)
+        db_guild = await guild.get()
         print(f"サーバー:{guild.name}")
-        print(f"接頭文字:{guild.prefix}")
+        print(f"接頭文字:{db_guild.prefix}")
 
     # 起動用の補助関数です
     async def setup_discordbot(self, app, loop):
