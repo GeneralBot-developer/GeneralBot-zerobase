@@ -48,7 +48,13 @@ class GeneralBotCore(Bot):
         return await super().is_owner(user)
 
     def load_cogs(self):
-        cog_files = ["Utils", "RoleKeeper", "screenshot", "music_player"]
+        cog_files = [
+            "Utils",
+            "RoleKeeper",
+            "screenshot",
+            "music_player",
+            "Calculation"
+            ]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")
             LOG.info(f"{cog}のロード完了。")
