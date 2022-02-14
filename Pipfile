@@ -44,6 +44,7 @@ webdriver-manager = "*"
 pyppeteer = "*"
 youtube-dl = "*"
 lark = "*"
+gtts = "*"
 
 [dev-packages]
 flake8 = "*"

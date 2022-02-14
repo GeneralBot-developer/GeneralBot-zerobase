@@ -81,7 +81,11 @@ class Calculation(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="calc", aliases=["calculate"])
+    @commands.command(
+        name="calc",
+        aliases=["calculate"],
+        help="""<formula>に計算式を入れると計算します。\n例：calc 1+2*3=7\n"""
+        )
     async def calc(self, ctx, formula):
         try:
             await ctx.send(myeval(formula))

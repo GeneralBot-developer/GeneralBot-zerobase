@@ -9,14 +9,14 @@ class ScreenShot(Cog):
         self.bot = bot
 
     async def get_ss(self, url: str):
-        browser = await launch()
+        browser = await launch(headless=True, args=['--no-sandbox'])
         page = await browser.newPage()
         await page.goto(url)
         await page.setViewport({'width': 800, 'height': 1000})
         await page.screenshot(path='./GBot/data/screenshot.png')
         await browser.close()
 
-    @command()
+    @command(help="スクリーンショットを取得します。")
     async def ss(self, ctx: Context, url):
         async with ctx.typing():
             await self.get_ss(url)

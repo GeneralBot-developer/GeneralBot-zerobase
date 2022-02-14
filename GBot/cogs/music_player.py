@@ -132,7 +132,11 @@ class Music_Player(commands.Cog):
             return
         await self.play_only(ctx)
 
-    @music.command(name="play", aliases=["p"])
+    @music.command(
+        name="play",
+        aliases=["p"],
+        help="指定したURLを再生します。"
+        )
     async def play(self, ctx, url):
         if ctx.author.voice is None:
             await ctx.reply("あなたはボイスチャンネルに接続していません。")
@@ -143,33 +147,40 @@ class Music_Player(commands.Cog):
         await self.register_queue(ctx, url)
         await self.play_only(ctx)
 
-    @music.command(name="stop", aliases=["s"])
+    @music.command(
+        name="stop",
+        aliases=["s"],
+        help="再生を停止します。"
+        )
     async def stop(self, ctx):
         ctx.voice_client.stop()
         await ctx.reply("停止しました。")
 
-    @music.command(name="pause")
+    @music.command(
+        name="pause",
+        help="再生を一時停止します。"
+        )
     async def pause(self, ctx):
         if ctx.voice_client.is_playing():
             ctx.voice_client.pause()
             await ctx.reply("一時停止しました。")
         await ctx.reply("再生中ではありません。")
 
-    @music.command(name="resume", aliases=["r"])
+    @music.command(name="resume", aliases=["r"], help="再生を再開します。")
     async def resume(self, ctx):
         if ctx.voice_client.is_paused():
             ctx.voice_client.resume()
             await ctx.reply("再開しました。")
         await ctx.reply("再生中です。")
 
-    @music.command(name="skip", aliases=["next"])
+    @music.command(name="skip", aliases=["next"], help="次の曲を再生します。")
     async def skip(self, ctx):
         if ctx.voice_client.is_playing():
             ctx.voice_client.stop()
             await ctx.reply("スキップしました。")
         await ctx.reply("再生中ではありません。")
 
-    @music.command(name="queue", aliases=["q"])
+    @music.command(name="queue", aliases=["q"], help="再生リストを表示します。")
     async def queue(self, ctx):
         if ctx.guild.id not in self.queue:
             await ctx.reply("キューが空です。")
@@ -185,7 +196,7 @@ class Music_Player(commands.Cog):
                 )
         await ctx.send(embed=embed)
 
-    @music.command(name="clear", aliases=["c"])
+    @music.command(name="clear", aliases=["c"], help="キューを空にします。")
     async def clear(self, ctx):
         if ctx.guild.id not in self.queue:
             await ctx.reply("キューが空です。")
@@ -193,7 +204,7 @@ class Music_Player(commands.Cog):
         self.queue[ctx.guild.id] = []
         await ctx.reply("キューを空にしました。")
 
-    @music.command(name="volume", aliases=["v"])
+    @music.command(name="volume", aliases=["v"], help="音量を変更します。")
     async def volume(self, ctx, volume: int):
         if volume < 0 or volume > 100:
             await ctx.reply("0から100の間で指定してください。")
@@ -201,7 +212,7 @@ class Music_Player(commands.Cog):
         ctx.voice_client.source.volume = volume / 100
         await ctx.reply(f"音量を{volume}%にしました。")
 
-    @music.command(name="now", aliases=["n"])
+    @music.command(name="now", aliases=["n"], help="再生中の曲を表示します。")
     async def now(self, ctx):
         if ctx.guild.id not in self.queue:
             await ctx.reply("キューが空です。")
@@ -209,7 +220,7 @@ class Music_Player(commands.Cog):
         source = self.queue[ctx.guild.id][-1]
         await ctx.send(embed=await self.create_embed(source))
 
-    @music.command(name="shuffle", aliases=["random"])
+    @music.command(name="shuffle", aliases=["random"], help="再生リストをシャッフルします。")
     async def shuffle(self, ctx):
         if ctx.guild.id not in self.queue:
             await ctx.reply("キューが空です。")
@@ -217,7 +228,7 @@ class Music_Player(commands.Cog):
         random.shuffle(self.queue[ctx.guild.id])
         await ctx.reply("シャッフルしました。")
 
-    @music.command(name="repeat", aliases=["rp"])
+    @music.command(name="repeat", aliases=["rp"], help="再生リストを繰り返し再生します。")
     async def repeat(self, ctx):
         if ctx.guild.id not in self.queue:
             await ctx.reply("キューが空です。")
@@ -225,7 +236,7 @@ class Music_Player(commands.Cog):
         self.queue[ctx.guild.id].append(self.queue[ctx.guild.id][-1])
         await ctx.reply("リピートしました。")
 
-    @music.command(name="leave", aliases=["l"])
+    @music.command(name="leave", aliases=["l"], help="ボイスチャンネルから退出します。")
     async def leave(self, ctx):
         if ctx.guild.voice_client is None:
             await ctx.reply("ボイスチャンネルに接続していません。")
@@ -233,7 +244,7 @@ class Music_Player(commands.Cog):
         await ctx.voice_client.disconnect()
         await ctx.reply("切断しました。")
 
-    @music.command(name="help", aliases=["h"])
+    @music.command(name="help", aliases=["h"], help="ヘルプを表示します。")
     async def help(self, ctx):
         embed = nextcord.Embed(title="ヘルプ", color=0x00ff00)
         embed.add_field(

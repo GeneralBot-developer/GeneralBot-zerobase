@@ -5,6 +5,7 @@ import sys
 from GBot.CRUD.guild import Guild
 from sanic import Sanic
 from sanic.response import text
+from GBot.functions.help import HelpCommand
 sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
 import nextcord
 from nextcord.ext.commands import Bot
@@ -67,9 +68,9 @@ class GeneralBotCore(Bot):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
-                if self.user.id == 484655503675228171:
+                if self.user.id == 899076159604686850:
                     print(f"サーバー:{message.guild.name}")
-                    print(f"接頭文字:{guild.prefix}")
+                    print("接頭文字:gc!")
                     return "gc!"
                 else:
                     print(f"サーバー:{message.guild.name}")
@@ -88,7 +89,7 @@ class GeneralBotCore(Bot):
 
     async def on_guild_join(self, guild: nextcord.Guild):
         db_guild = await Guild.create(guild.id)
-        db_guild = await guild.get()
+        db_guild = await db_guild.get()
         print(f"サーバー:{guild.name}")
         print(f"接頭文字:{db_guild.prefix}")
 
@@ -97,7 +98,8 @@ class GeneralBotCore(Bot):
         super().__init__(
             command_prefix=self.prefix,
             intents=self._intents,
-            loop=loop
+            loop=loop,
+            help_command=HelpCommand()
             )
         if self.jishaku:
             super().load_extension("jishaku")

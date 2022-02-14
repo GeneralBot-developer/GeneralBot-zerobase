@@ -18,12 +18,12 @@ class BotUtility(Cog):
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
 
-    @command()
+    @command(help="ping値を取得します。")
     async def ping(self, ctx):
         async with ctx.typing():
             await ctx.reply(f"Pong! {round(self.bot.latency * 1000)}ms.")
 
-    @command(ignore_extra=False)
+    @command(ignore_extra=False, help="prefixを変更します。")
     @has_permissions(administrator=True)
     async def prefix(self, ctx: Context, *, prefix: str):
         if len(prefix) > 8:
@@ -41,13 +41,13 @@ class BotUtility(Cog):
         raise error
 
     @is_owner()
-    @group(aliases=["mod", "dev", "develop"])
+    @group(aliases=["mod", "dev", "develop"], help="開発者コマンド")
     async def moderation(self, ctx):
         if ctx.invoked_subcommand is None:
             return
 
     @is_owner()
-    @moderation.command()
+    @moderation.command(help="botを再起動します。")
     async def restart(self, ctx):
         await ctx.send("Restarting...")
         os.execl(sys.executable, sys.executable, *sys.argv)
