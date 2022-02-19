@@ -131,3 +131,4 @@ dmypy.json
 db/migrate_dev/versions/*.py
 db/migrate_prod/versions/*.py
 .m4a
+mecab-ipadic-neologd
