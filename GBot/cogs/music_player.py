@@ -52,8 +52,8 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
             lambda: ytdl.extract_info(
                 url,
                 download=not stream
-                )
             )
+        )
 
         if 'entries' in data:
             # take first item from a playlist
@@ -64,9 +64,9 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
             nextcord.FFmpegPCMAudio(
                 filename,
                 **ffmpeg_options
-                ),
+            ),
             data=data
-            )
+        )
 
 
 class Music_Player(commands.Cog):
@@ -101,7 +101,7 @@ class Music_Player(commands.Cog):
             url,
             loop=self.bot.loop,
             stream=True
-            )
+        )
         if ctx.guild.id not in self.queue:
             self.queue[ctx.guild.id] = []
         self.queue[ctx.guild.id].append(source)
@@ -110,6 +110,8 @@ class Music_Player(commands.Cog):
 
     async def play_only(self, ctx: Context):
         """Play only"""
+        if len(self.queue[ctx.guild.id]) == 0:
+            await ctx.send("キューが空になりました。")
         async with ctx.typing():
             source = self.queue[ctx.guild.id][-1]
             await ctx.send(embed=await self.create_embed(source))
@@ -120,15 +122,15 @@ class Music_Player(commands.Cog):
                 after=lambda _: self.bot.loop.create_task(
                     self.play_end(
                         ctx
-                        )
                     )
                 )
+            )
 
     async def play_end(self, ctx):
         """play_end"""
         self.queue[ctx.guild.id].pop(-1)
-        if self.queue.get(ctx.guild.id) is []:
-            await ctx.send("再生リストが空になったので終了します。")
+        if len(self.queue[ctx.guild.id]) == 0:
+            await ctx.send("キューが空になりました。")
             return
         await self.play_only(ctx)
 
@@ -136,7 +138,7 @@ class Music_Player(commands.Cog):
         name="play",
         aliases=["p"],
         help="指定したURLを再生します。"
-        )
+    )
     async def play(self, ctx, url):
         if ctx.author.voice is None:
             await ctx.reply("あなたはボイスチャンネルに接続していません。")
@@ -151,7 +153,7 @@ class Music_Player(commands.Cog):
         name="stop",
         aliases=["s"],
         help="再生を停止します。"
-        )
+    )
     async def stop(self, ctx):
         ctx.voice_client.stop()
         await ctx.reply("停止しました。")
@@ -159,7 +161,7 @@ class Music_Player(commands.Cog):
     @music.command(
         name="pause",
         help="再生を一時停止します。"
-        )
+    )
     async def pause(self, ctx):
         if ctx.voice_client.is_playing():
             ctx.voice_client.pause()
@@ -193,7 +195,7 @@ class Music_Player(commands.Cog):
                 name=f"{i + 1}",
                 value=f"{source.title} [{h}時間{m}分{s}秒]",
                 inline=False
-                )
+            )
         await ctx.send(embed=embed)
 
     @music.command(name="clear", aliases=["c"], help="キューを空にします。")
@@ -251,57 +253,57 @@ class Music_Player(commands.Cog):
             name="play",
             value="指定したURLを再生します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="stop",
             value="再生を停止します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="pause",
             value="再生を一時停止します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="resume",
             value="再生を再開します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="skip",
             value="再生をスキップします。",
             inline=False
-            )
+        )
         embed.add_field(
             name="queue",
             value="再生リストを表示します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="clear",
             value="再生リストを空にします。",
             inline=False
-            )
+        )
         embed.add_field(
             name="shuffle",
             value="再生リストをシャッフルします。",
             inline=False
-            )
+        )
         embed.add_field(
             name="repeat",
             value="再生リストをリピートします。",
             inline=False
-            )
+        )
         embed.add_field(
             name="leave",
             value="ボイスチャンネルから切断します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="volume",
             value="音量を変更します。",
             inline=False
-            )
+        )
         embed.add_field(
             name="now",
             value="再生中の曲を表示します。",

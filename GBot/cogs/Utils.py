@@ -1,5 +1,4 @@
-import os
-import sys
+import subprocess
 
 from GBot.CRUD.guild import Guild
 
@@ -50,7 +49,13 @@ class BotUtility(Cog):
     @moderation.command(help="botを再起動します。")
     async def restart(self, ctx):
         await ctx.send("Restarting...")
-        os.execl(sys.executable, sys.executable, *sys.argv)
+        bot_id = self.bot.user.id
+        self.bot.app.stop()
+        if bot_id == 878264570370748416:
+            subprocess.run("bash run.sh", shell=True)
+
+        elif bot_id == 899076159604686850:
+            subprocess.run("bash run.dev.sh", shell=True)
 
 
 def setup(bot):

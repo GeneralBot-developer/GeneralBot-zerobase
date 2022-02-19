@@ -1,7 +1,9 @@
 from logging import INFO, basicConfig, getLogger
 
 import sys
+from typing import Dict, Set
 
+from GBot.data.voice import VoiceState
 from GBot.CRUD.guild import Guild
 from sanic import Sanic
 from sanic.response import text
@@ -19,6 +21,7 @@ team_id = [
     910588052102086728,
     484655503675228171
     ]
+
 
 class GeneralBotCore(Bot):
     def __init__(self, *, prefix, token, jishaku=True, sanic=False, _intents):
@@ -63,6 +66,12 @@ class GeneralBotCore(Bot):
 
     async def on_ready(self):
         LOG.info(f"Logger in {self.user}")
+        self.voice: Dict[int, Set[VoiceState]]
+        for guild in self.guilds:
+            self.voice = {
+                guild.id: VoiceState.NOT_PLAYED
+            }
+        print(self.voice)
 
     async def get_prefix(self, message: nextcord.Message):
         guild = await Guild(message.guild.id).get()

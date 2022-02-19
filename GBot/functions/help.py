@@ -1,6 +1,6 @@
 from nextcord.ext import commands
 import nextcord
-from GBot.CRUD.guild import Guild
+import Levenshtein
 
 
 class HelpCommand(commands.HelpCommand):
@@ -50,11 +50,27 @@ class HelpCommand(commands.HelpCommand):
             )
         await self.get_destination().send(embed=embed)
 
+    def get_commands(self):
+        return self.context.bot.commands
+
     async def command_not_found(self, string):
         embed = nextcord.Embed(
             title="コマンドが見つかりませんでした。",
             description=f"{string}",
             color=0xff0000
+            )
+        command_list = []
+        cmds = self.get_commands()
+        for command in cmds:
+            if Levenshtein.ratio(command.name, string) > 0.5:
+                command_list.append(command.name)
+            else:
+                pass
+        if len(command_list) == 0:
+            command_list.append("見つかりませんでした")
+        embed.add_field(
+            name="もしかして：",
+            value="\n".join([f"`{command}`" for command in command_list])
             )
         await self.get_destination().send(embed=embed)
 
