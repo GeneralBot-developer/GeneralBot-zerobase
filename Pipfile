@@ -49,6 +49,7 @@ python-levenshtein-wheels = "*"
 sentry-sdk = "*"
 mecab-python3 = "*"
 pydub = "*"
+cryptocode = "*"
 
 [dev-packages]
 flake8 = "*"

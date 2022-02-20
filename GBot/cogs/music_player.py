@@ -41,7 +41,7 @@ class YTDLSource(nextcord.PCMVolumeTransformer):
         self.title: str = data.get('title')
         self.thumbnail: str = data.get('thumbnail')
         self.duration: int = data.get('duration')
-        self.channel: int = data.get('channel')
+        self.channel: str = data.get('channel')
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):

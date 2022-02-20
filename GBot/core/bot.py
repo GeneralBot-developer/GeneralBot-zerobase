@@ -1,4 +1,5 @@
 from logging import INFO, basicConfig, getLogger
+import statistics
 
 import sys
 from typing import Dict, Set
@@ -20,12 +21,14 @@ team_id = [
     743455582517854239,
     910588052102086728,
     484655503675228171
-    ]
+]
 
 
 class GeneralBotCore(Bot):
     def __init__(self, *, prefix, token, jishaku=True, sanic=False, _intents):
         super().__init__(command_prefix=None)
+        self.voice = {}
+        self.voice: Dict[int, Set[VoiceState]]
         self.token = token
         self.prefix = prefix
         self.jishaku = jishaku
@@ -44,7 +47,7 @@ class GeneralBotCore(Bot):
             self.app.add_route(self.keep_alive, '/')
 
     async def keep_alive(self, request):
-        return text("Bot is alive")
+        return text("Hey Guys!")
 
     async def is_owner(self, user: nextcord.User):
         if user.id in team_id:
@@ -57,8 +60,9 @@ class GeneralBotCore(Bot):
             "RoleKeeper",
             "screenshot",
             "music_player",
-            "Calculation"
-            ]
+            "Calculation",
+            "tts"
+        ]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")
             LOG.info(f"{cog}のロード完了。")
@@ -66,11 +70,9 @@ class GeneralBotCore(Bot):
 
     async def on_ready(self):
         LOG.info(f"Logger in {self.user}")
-        self.voice: Dict[int, Set[VoiceState]]
+        print(self.guilds)
         for guild in self.guilds:
-            self.voice = {
-                guild.id: VoiceState.NOT_PLAYED
-            }
+            self.voice[guild.id] = VoiceState.NOT_PLAYED
         print(self.voice)
 
     async def get_prefix(self, message: nextcord.Message):
@@ -96,11 +98,11 @@ class GeneralBotCore(Bot):
             print(f"サーバー:{message.guild.name}")
             print(f"接頭文字:{guild.prefix}")
 
-    async def on_guild_join(self, guild: nextcord.Guild):
-        db_guild = await Guild.create(guild.id)
-        db_guild = await db_guild.get()
-        print(f"サーバー:{guild.name}")
-        print(f"接頭文字:{db_guild.prefix}")
+        async def on_guild_join(self, guild: nextcord.Guild):
+            db_guild = await Guild.create(guild.id)
+            db_guild = await db_guild.get()
+            print(f"サーバー:{guild.name}")
+            print(f"接頭文字:{db_guild.prefix}")
 
     # 起動用の補助関数です
     async def setup_discordbot(self, app, loop):

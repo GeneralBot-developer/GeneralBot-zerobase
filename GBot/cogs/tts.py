@@ -1,4 +1,3 @@
-import gTTS
 from nextcord.ext import commands
 import nextcord
 from GBot.data.voice import VoiceState
@@ -8,11 +7,14 @@ import json
 import os
 import subprocess
 from pydub import AudioSegment
+from nextcord.ext.commands import Context
+from nextcord import Message
+import re
 
 
 class CommonModule:
-    def load_json(self, file):
-        with open(file, 'r', encoding='utf-8') as f:
+    def load_json(self, file, encoding):
+        with open(file, 'r', encoding=encoding) as f:
             json_data = json.load(f)
         return json_data
 
@@ -44,7 +46,7 @@ class NLP:
 
     def evaluate_pn_ja_wordlist(self, wordlist, word_pn_dictpath=None):
         if word_pn_dictpath is None:
-            word_pn_dict = self.cm.load_json('pn_ja.json')
+            word_pn_dict = self.cm.load_json(file='./GBot/data/pn_ja.json', encoding='cp932')
         else:
             word_pn_dict = self.cm.load_json(word_pn_dictpath)
 
@@ -85,8 +87,8 @@ class VoiceChannel:
     def __init__(self):
         self.conf = {
             "voice_configs": {
-                "htsvoice_resource": "/usr/local/Cellar/open-jtalk/1.11/voice/",
-                "jtalk_dict": "/usr/local/Cellar/open-jtalk/1.11/dic"}}
+                "htsvoice_resource": "/usr/share/hts-voice/",
+                "jtalk_dict": "/var/lib/mecab/dic/open-jtalk/naist-jdic"}}
 
     def make_by_jtalk(
             self,
@@ -101,61 +103,55 @@ class VoiceChannel:
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'mei/mei_normal.htsvoice'
-                        )
-                    ],
+                    )
+                ],
                 'angry': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'mei/mei_angry.htsvoice'
-                        )
-                    ],
+                    )
+                ],
                 'bashful': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'mei/mei_bashful.htsvoice'
-                        )
-                    ],
+                    )
+                ],
                 'happy': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'mei/mei_happy.htsvoice'
-                        )
-                    ],
+                    )],
                 'sad': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'mei/mei_sad.htsvoice'
-                        )
-                    ]
+                    )
+                ]
             },
             'm100': {
                 'normal': [
@@ -163,13 +159,12 @@ class VoiceChannel:
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'm100/nitech_jp_atr503_m001.htsvoice'
-                        )
-                    ]
+                    )
+                ]
             },
             'tohoku-f01': {
                 'normal': [
@@ -177,49 +172,45 @@ class VoiceChannel:
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'htsvoice-tohoku-f01-master/tohoku-f01-neutral.htsvoice'
-                        )
-                    ],
+                    )
+                ],
                 'angry': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'htsvoice-tohoku-f01-master/tohoku-f01-angry.htsvoice'
-                        )
-                    ],
+                    )
+                ],
                 'happy': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'htsvoice-tohoku-f01-master/tohoku-f01-happy.htsvoice'
-                        )
-                    ],
+                    )
+                ],
                 'sad': [
                     '-m',
                     os.path.join(
                         self.conf[
                             'voice_configs'
-                            ]
-                        [
+                        ][
                             'htsvoice_resource'
-                            ],
+                        ],
                         'htsvoice-tohoku-f01-master/tohoku-f01-sad.htsvoice'
-                        )
-                    ]
+                    )
+                ]
             }
         }
 
@@ -241,12 +232,53 @@ class VoiceChannel:
 class Text_To_Speech(commands.Cog):
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
-        self.voice_processings = {}
+        self.voice_processings = []
 
-    async def generate_voicefile(self, ctx):
-        message = self.voice_processings[ctx.guild.id]
-        tts = gTTS(text=message.content, lang="ja")
-        return nextcord.FFmpegPCMAudio(tts)
+    def remove_custom_emoji(self, text):
+        pattern = r'<:[a-zA-Z0-9_]+:[0-9]+>'    # カスタム絵文字のパターン
+        return re.sub(pattern, '', text)   # 置換処理
+
+    # urlAbb
+    # URLなら省略
+    def urlAbb(self, text):
+        pattern = r"https?://[\w/:%#\$&\?\(\)~\.=\+\-]+"
+        return re.sub(pattern, 'URLは省略するのデス！', text)   # 置換処理
+
+    def register_processing(
+        self,
+        text: str,
+        channel: nextcord.TextChannel,
+    ):
+        self.voice_processings.append({
+            channel.id: text
+        }
+        )
+        return
+
+    def create_voice(self, ctx: Context):
+        nlp = NLP()
+        vc = VoiceChannel()
+        text = self.voice_processings[-1]
+        text = text[ctx.channel.id]
+        text = self.remove_custom_emoji(text)
+        text = self.urlAbb(text)
+        emotion = nlp.analysis_emotion(text)
+        voice_file = vc.make_by_jtalk(text, "tts_voice", emotion=emotion)
+        return nextcord.FFmpegPCMAudio(voice_file)
+
+    async def play_only(self, ctx):
+        text = self.create_voice(ctx)
+        ctx.guild.voice_client.play(
+            text,
+            after=lambda _: self.bot.loop.create_task(
+                self.play_end(
+                    ctx
+                )
+            )
+        )
+
+    async def play_end(self, ctx):
+        self.voice_processings.pop(-1)
 
     @commands.group(name="tts", aliases=["text_to_speech"], help="テキストを読み上げる")
     async def tts(self, ctx):
@@ -257,12 +289,12 @@ class Text_To_Speech(commands.Cog):
     async def join(self, ctx):
         if ctx.author.voice is None:
             return await ctx.send("あなたはボイスチャンネルに参加していません")
-        voice_state = self.bot.voice[ctx.guild.id]
-        if not VoiceState.NOT_PLAYED == voice_state(1):
+        vs = self.bot.voice[ctx.guild.id]
+        print(vs)
+        if not VoiceState.NOT_PLAYED == vs:
             return await ctx.send("Botは既にボイスチャンネルに参加しています")
-
         else:
-            voice_state = VoiceState.YOMIAGE
+            self.bot.voice[ctx.guild.id] = VoiceState.YOMIAGE
             await ctx.author.voice.channel.connect()
             await ctx.send("Botをボイスチャンネルに参加しました")
 
@@ -271,23 +303,36 @@ class Text_To_Speech(commands.Cog):
         if ctx.author.voice is None:
             return await ctx.send("あなたはボイスチャンネルに参加していません")
         voice_state = self.bot.voice[ctx.guild.id]
-        if not VoiceState.NOT_PLAYED == voice_state(0):
-            voice_state = VoiceState.NOT_PLAYED
-            await ctx.author.voice.channel.disconnect()
+        if not VoiceState.NOT_PLAYED == voice_state:
+            self.bot.voice[ctx.guild.id] = VoiceState.NOT_PLAYED
+            await ctx.guild.voice_client.disconnect()
+            del self.voice_processings[ctx.channel.id]
             await ctx.send("Botをボイスチャンネルから離脱しました")
         else:
             await ctx.send("Botはボイスチャンネルに参加していません")
 
+    @tts.command(name="volume", aliases=["v"], help="ボリュームを変更する")
+    async def volume(self, ctx, volume: int):
+        if volume < 0 or volume > 100:
+            await ctx.reply("0から100の間で指定してください。")
+            return
+        ctx.voice_client.source.volume = volume / 100
+        await ctx.reply(f"音量を{volume}%にしました。")
+
     @commands.Cog.listener()
-    async def text_to_speech(self, message):
+    async def on_message(self, message: Message):
+        if message.author.bot:
+            return
+        if message.content.startswith(await self.bot.get_prefix(message)):
+            return
         if message.author.voice is None:
             return
         if self.bot.voice[message.guild.id] == VoiceState.NOT_PLAYED or \
                 self.bot.voice[message.guild.id] == VoiceState.MUSIC:
             return
-        self.voice_processings[
-            message.guild.id
-        ] = message
+        self.register_processing(message.content, message.channel)
+        ctx = await self.bot.get_context(message)
+        await self.play_only(ctx)
 
 
 def setup(bot):
