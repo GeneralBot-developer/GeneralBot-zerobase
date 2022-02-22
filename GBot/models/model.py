@@ -25,5 +25,5 @@ auth = Table(
     "auth",
     meta,
     Column("user_id", BigInteger(), nullable=False, primary_key=True),
-    Column("passcord", String(4)),
+    Column("passcord", String(4))
 )
