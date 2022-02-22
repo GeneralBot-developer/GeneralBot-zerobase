@@ -107,6 +107,7 @@ class GeneralBotCore(Bot):
     async def on_guild_join(self, guild: nextcord.Guild):
         db_guild = await Guild.create(guild.id)
         db_guild = await db_guild.get()
+        self.voice[guild.id] = VoiceState.NOT_PLAYED
         print(f"サーバー:{guild.name}")
         print(f"接頭文字:{db_guild.prefix}")
 

@@ -216,7 +216,7 @@ class VoiceChannel:
 
         open_jtalk = ['open_jtalk']
         mech = ['-x', self.conf['voice_configs']['jtalk_dict']]
-        speed = ['-r', '1.0']
+        speed = ['-r', '0.5']
         outwav = ['-ow', filepath + '.wav']
         cmd = open_jtalk + mech + htsvoice[voicetype][emotion] + speed + outwav
         c = subprocess.Popen(cmd, stdin=subprocess.PIPE)
@@ -279,6 +279,8 @@ class Text_To_Speech(commands.Cog):
         )
 
     async def play_end(self, ctx):
+        if len(self.voice_processings) < 0:
+            return
         self.voice_processings.pop(-1)
 
     @commands.group(name="tts", aliases=["text_to_speech"], help="テキストを読み上げる")
@@ -337,8 +339,8 @@ class Text_To_Speech(commands.Cog):
             return
         self.register_processing(message.content, message.channel)
         ctx = await self.bot.get_context(message)
-        await self.play_only(ctx)
-
+        if len(self.voice_processings) > 0:
+            await self.play_only(ctx)
 
 def setup(bot):
     bot.add_cog(Text_To_Speech(bot))

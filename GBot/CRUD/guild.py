@@ -15,19 +15,19 @@ class Guild(CRUDBase):
         self.guild_id = guild_id
 
     async def get(self):
-        q = model.guild.select().where(self.guild_id == model.guild.c.id)
+        q = model.guild.select().where(self.guild_id == model.auth.c.id)
         result = await self.execute(q)
         return await result.fetchone()
 
     async def set(self, **kwargs):
         q = model.guild.update(None).where(
-            self.guild_id == model.guild.c.id
+            self.guild_id == model.auth.c.id
         ).values(**kwargs)
         await self.execute(q)
         return self
 
     async def delete(self):
-        q = model.guild.delete(None).where(self.guild_id == model.guild.c.id)
+        q = model.auth.delete(None).where(self.user_id == model.auth.c.id)
         await self.execute(q)
         return self
 
@@ -43,4 +43,3 @@ class Guild(CRUDBase):
         q = model.guild.select()
         results = await cls.execute(q)
         return await results.fetchall()
-

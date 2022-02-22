@@ -50,6 +50,7 @@ sentry-sdk = "*"
 mecab-python3 = "*"
 pydub = "*"
 cryptocode = "*"
+captcha = "*"
 
 [dev-packages]
 flake8 = "*"
