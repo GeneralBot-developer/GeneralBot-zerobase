@@ -311,7 +311,7 @@ class Text_To_Speech(commands.Cog):
             self.bot.voice[ctx.guild.id] = VoiceState.NOT_PLAYED
             self.using_textchannel.remove(ctx.channel.id)
             await ctx.guild.voice_client.disconnect()
-            del self.voice_processings[ctx.channel.id]
+            self.using_textchannel.remove(ctx.channel.id)
             await ctx.send("Botをボイスチャンネルから離脱しました")
         else:
             await ctx.send("Botはボイスチャンネルに参加していません")
