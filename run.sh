@@ -1,6 +1,7 @@
 #!/bin/sh
 #code1
 set -eu
+git pull origin master
 pip install pipenv
 pipenv install
 python -m pip install python-dotenv
