@@ -145,7 +145,7 @@ class GeneralBotCore(Bot):
         else:
             embed.title = "ERROR: Unknown Error"
             embed.description = "エラーが発生しました。"
-            embed.add_field(name="".join(traceback.TracebackException.from_exception(error).format()), value="アク修正しろよ")
+            embed.add_field(name="アク修正しろよ", value="".join(traceback.TracebackException.from_exception(error).format()))
             await ctx.reply(embed=embed)
 
     # 起動用の補助関数
