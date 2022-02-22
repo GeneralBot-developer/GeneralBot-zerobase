@@ -339,8 +339,11 @@ class Text_To_Speech(commands.Cog):
             return
         self.register_processing(message.content, message.channel)
         ctx = await self.bot.get_context(message)
-        if len(self.voice_processings) > 0:
+        if len(self.voice_processings) < 0:
             await self.play_only(ctx)
+        else:
+            return
+
 
 def setup(bot):
     bot.add_cog(Text_To_Speech(bot))
