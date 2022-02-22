@@ -233,6 +233,7 @@ class Text_To_Speech(commands.Cog):
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
         self.voice_processings = []
+        self.using_textchannel = []
 
     def remove_custom_emoji(self, text):
         pattern = r'<:[a-zA-Z0-9_]+:[0-9]+>'    # カスタム絵文字のパターン
@@ -294,6 +295,7 @@ class Text_To_Speech(commands.Cog):
         if not VoiceState.NOT_PLAYED == vs:
             return await ctx.send("Botは既にボイスチャンネルに参加しています")
         else:
+            self.using_textchannel.append(ctx.channel.id)
             self.bot.voice[ctx.guild.id] = VoiceState.YOMIAGE
             await ctx.author.voice.channel.connect()
             await ctx.send("Botをボイスチャンネルに参加しました")
@@ -305,6 +307,7 @@ class Text_To_Speech(commands.Cog):
         voice_state = self.bot.voice[ctx.guild.id]
         if not VoiceState.NOT_PLAYED == voice_state:
             self.bot.voice[ctx.guild.id] = VoiceState.NOT_PLAYED
+            self.using_textchannel.remove(ctx.channel.id)
             await ctx.guild.voice_client.disconnect()
             del self.voice_processings[ctx.channel.id]
             await ctx.send("Botをボイスチャンネルから離脱しました")
@@ -321,6 +324,8 @@ class Text_To_Speech(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: Message):
+        if message.channel.id not in self.using_textchannel:
+            return
         if message.author.bot:
             return
         if message.content.startswith(await self.bot.get_prefix(message)):

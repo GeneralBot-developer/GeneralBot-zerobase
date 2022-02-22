@@ -17,7 +17,7 @@ MODELS_ROOT = BASE_DIR + '/../GBot/models'
 sys.path.append(MODELS_ROOT)
 
 target_models = [
-    "guild",
+    "model",
 ]
 
 

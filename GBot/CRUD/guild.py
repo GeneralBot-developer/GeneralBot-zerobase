@@ -1,4 +1,4 @@
-from GBot.models import guild as model
+from GBot.models import model as model
 from GBot.db import DataBaseEntryPoint as DB
 
 

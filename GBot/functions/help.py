@@ -21,7 +21,7 @@ class HelpCommand(commands.HelpCommand):
                         [
                             f"```{command.name} - {command.short_doc}```"
                             for command in cog.get_commands()
-                            ]
+                        ]
                     ),
                     inline=False
                 )
@@ -34,7 +34,7 @@ class HelpCommand(commands.HelpCommand):
             title=f"{cog.qualified_name}のコマンド一覧",
             description=" ",
             color=0x00ff00
-            )
+        )
         for command in cog.get_commands():
             embed.add_field(
                 name=command.name,
@@ -47,7 +47,7 @@ class HelpCommand(commands.HelpCommand):
             title=f"`{self.get_command_signature(command)}`の使い方",
             description=f"{command.help}",
             color=0x00ff00
-            )
+        )
         await self.get_destination().send(embed=embed)
 
     def get_commands(self):
@@ -58,7 +58,7 @@ class HelpCommand(commands.HelpCommand):
             title="コマンドが見つかりませんでした。",
             description=f"{string}",
             color=0xff0000
-            )
+        )
         command_list = []
         cmds = self.get_commands()
         for command in cmds:
@@ -71,8 +71,11 @@ class HelpCommand(commands.HelpCommand):
         embed.add_field(
             name="もしかして：",
             value="\n".join([f"`{command}`" for command in command_list])
-            )
-        await self.get_destination().send(embed=embed)
+        )
+        return embed
+
+    async def send_error_message(self, error):
+        await self.get_destination().send(embed=error)
 
     async def send_group_help(self, group):
         embed = nextcord.Embed(

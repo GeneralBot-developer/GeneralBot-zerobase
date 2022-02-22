@@ -1,17 +1,20 @@
 from logging import INFO, basicConfig, getLogger
-import statistics
-
 import sys
 from typing import Dict, Set
-
 from GBot.data.voice import VoiceState
+import Levenshtein
+import traceback
+
 from GBot.CRUD.guild import Guild
 from sanic import Sanic
 from sanic.response import text
 from GBot.functions.help import HelpCommand
+
 sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
 import nextcord
 from nextcord.ext.commands import Bot
+from nextcord.ext.commands.errors import MissingPermissions, CommandNotFound, NotOwner
+
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
 
@@ -61,7 +64,9 @@ class GeneralBotCore(Bot):
             "screenshot",
             "music_player",
             "Calculation",
-            "tts"
+            "tts",
+            "virtual_money",
+            "crypto"
         ]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")
@@ -97,14 +102,52 @@ class GeneralBotCore(Bot):
             guild = await guild.get()
             print(f"サーバー:{message.guild.name}")
             print(f"接頭文字:{guild.prefix}")
+            return guild.prefix
 
-        async def on_guild_join(self, guild: nextcord.Guild):
-            db_guild = await Guild.create(guild.id)
-            db_guild = await db_guild.get()
-            print(f"サーバー:{guild.name}")
-            print(f"接頭文字:{db_guild.prefix}")
+    async def on_guild_join(self, guild: nextcord.Guild):
+        db_guild = await Guild.create(guild.id)
+        db_guild = await db_guild.get()
+        print(f"サーバー:{guild.name}")
+        print(f"接頭文字:{db_guild.prefix}")
 
-    # 起動用の補助関数です
+    async def on_command_error(self, ctx, error):
+        embed = nextcord.Embed(color=0xff0000)
+        if isinstance(error, MissingPermissions):
+            embed.title = "ERROR: Missing Permissions"
+            embed.description = "このコマンドを実行するための権限がありません。"
+            return await ctx.reply(
+                embed=embed,
+            )
+        elif isinstance(error, CommandNotFound):
+            command_list = []
+            cmds = self.commands
+            for command in cmds:
+                if Levenshtein.ratio(command.name, ctx.message.content) > 0.5:
+                    command_list.append(command.name)
+            else:
+                pass
+            if len(command_list) == 0:
+                command_list.append("見つかりませんでした")
+            embed.add_field(
+                name="もしかして：",
+                value="\n".join([f"`{command}`" for command in command_list])
+            )
+            embed.title = "ERROR：NotCommandFound."
+            embed.description = "コマンドが見つかりませんでした。"
+            return await ctx.reply(
+                embed=embed
+            )
+        elif isinstance(error, NotOwner):
+            return await ctx.reply(
+                "このコマンドは管理者のみ実行できます。"
+            )
+        else:
+            embed.title = "ERROR: Unknown Error"
+            embed.description = "エラーが発生しました。"
+            embed.add_field("".join(traceback.TracebackException.from_exception(error).format()))
+            await ctx.reply(embed=embed)
+
+    # 起動用の補助関数
     async def setup_discordbot(self, app, loop):
         super().__init__(
             command_prefix=self.prefix,
