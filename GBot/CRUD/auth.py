@@ -15,25 +15,25 @@ class Auth(CRUDBase):
         self.user_id = user_id
 
     async def get(self):
-        q = model.auth.select().where(self.user_id == model.auth.c.id)
+        q = model.auth.select().where(self.user_id == model.auth.c.user_id)
         result = await self.execute(q)
         return await result.fetchone()
 
     async def set(self, **kwargs):
         q = model.auth.update(None).where(
-            self.user_id == model.auth.c.id
+            self.user_id == model.auth.c.user_id
         ).values(**kwargs)
         await self.execute(q)
         return self
 
     async def delete(self):
-        q = model.auth.delete(None).where(self.user_id == model.auth.c.id)
+        q = model.auth.delete(None).where(self.user_id == model.auth.c.user_id)
         await self.execute(q)
         return self
 
     @classmethod
-    async def create(cls, user_id):
-        q = model.auth.insert(None).values(id=user_id)
+    async def create(cls, user_id, passcord):
+        q = model.auth.insert(None).values(user_id=user_id, passcord=passcord)
         auth = cls(user_id)
         await cls.execute(q)
         return auth

@@ -4,10 +4,9 @@ from typing import Dict, Set
 from GBot.data.voice import VoiceState
 import Levenshtein
 import traceback
+from GBot.CRUD.virtual import VirtualMoney
 
 from GBot.CRUD.guild import Guild
-from sanic import Sanic
-from sanic.response import text
 from GBot.functions.help import HelpCommand
 
 sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
@@ -28,29 +27,12 @@ team_id = [
 
 
 class GeneralBotCore(Bot):
-    def __init__(self, *, prefix, token, jishaku=True, sanic=False, _intents):
-        super().__init__(command_prefix=None)
+    def __init__(self, *, prefix, token, onami: bool = True, intents):
+        super().__init__(command_prefix=None, intents=intents)
         self.voice = {}
         self.voice: Dict[int, Set[VoiceState]]
         self.token = token
-        self.prefix = prefix
-        self.jishaku = jishaku
-        self._intents = _intents
-        self.sanic = sanic
-        if sanic:
-            self.app = Sanic(name="GeneralBot")
-            self.app.register_listener(
-                self.setup_discordbot,
-                "main_process_start"
-            )
-            self.app.register_listener(
-                self.setout_discordbot,
-                "before_server_stop"
-            )
-            self.app.add_route(self.keep_alive, '/')
-
-    async def keep_alive(self, request):
-        return text("Hey Guys!")
+        self.load_cogs()
 
     async def is_owner(self, user: nextcord.User):
         if user.id in team_id:
@@ -66,11 +48,14 @@ class GeneralBotCore(Bot):
             "Calculation",
             "tts",
             "virtual_money",
-            "crypto"
+            "crypto",
+            "auth"
         ]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")
             LOG.info(f"{cog}のロード完了。")
+        if self.onami:
+            super().load_extension("onami")
         LOG.info("全ファイルが正常に読み込まれました。")
 
     async def on_ready(self):
@@ -81,6 +66,31 @@ class GeneralBotCore(Bot):
         print(self.voice)
 
     async def get_prefix(self, message: nextcord.Message):
+        guild = await Guild(message.guild.id).get()
+        if guild:
+            if guild.id == 878265923709075486:
+                if self.user.id == 899076159604686850:
+                    print(f"サーバー:{message.guild.name}")
+                    print("接頭文字:gc!")
+                    return "gc!"
+                else:
+                    print(f"サーバー:{message.guild.name}")
+                    print(f"接頭文字:{guild.prefix}")
+                    return guild.prefix
+            else:
+                print(f"サーバー:{message.guild.name}")
+                print(f"接頭文字:{guild.prefix}")
+                return guild.prefix
+        else:
+            LOG.info("該当するサーバーがなかったので新たに作成します。")
+            guild = await Guild.create(message.guild.id)
+            guild = await guild.get()
+            print(f"サーバー:{message.guild.name}")
+            print(f"接頭文字:{guild.prefix}")
+            return guild.prefix
+
+    @staticmethod
+    async def prefix(self, message: nextcord.Message):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
@@ -144,27 +154,22 @@ class GeneralBotCore(Bot):
             )
         else:
             embed.title = "ERROR: Unknown Error"
-            embed.description = "".join(traceback.TracebackException.from_exception(error).format())
+            embed.description = "```{0}```".format(
+                "".join(
+                    traceback.TracebackException.from_exception(
+                        error
+                    ).format()
+                )
+            )
             await ctx.reply(embed=embed)
 
-    # 起動用の補助関数
-    async def setup_discordbot(self, app, loop):
-        super().__init__(
-            command_prefix=self.prefix,
-            intents=self._intents,
-            loop=loop,
-            help_command=HelpCommand()
-            )
-        if self.jishaku:
-            super().load_extension("jishaku")
-        self.load_cogs()
-        loop.create_task(self.start(self.token))
-
-    async def setout_discordbot(self, app, loop):
-        await self.close()
-
-    def run(self, *args, **kwargs):
-        if self.sanic:
-            self.app.run(*args, **kwargs)
-        else:
+    def run(self):
+        try:
             self.loop.run_until_complete(self.start(self.token))
+        except nextcord.LoginFailure:
+            print("Discord Tokenが不正です")
+        except KeyboardInterrupt:
+            LOG.error("終了します")
+            self.loop.run_until_complete(self.logout())
+        else:
+            traceback.print_exc()

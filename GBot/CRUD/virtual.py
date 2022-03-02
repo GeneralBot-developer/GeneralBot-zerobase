@@ -24,6 +24,8 @@ class VirtualMoney(CRUDBase):
             self.guild_id == model.VirtualMoney.c.id
         ).values(**kwargs)
         await self.execute(q)
+        q = VM.select().where(ctx.guild.id == VM.c.id)
+        flag_modified(q, "members")
         return self
 
     async def delete(self):
@@ -32,8 +34,8 @@ class VirtualMoney(CRUDBase):
         return self
 
     @classmethod
-    async def create(cls, id, unit):
-        q = model.VirtualMoney.insert(None).values(id=id, unit=unit)
+    async def create(cls, id, unit, members):
+        q = model.VirtualMoney.insert(None).values(id=id, unit=unit, members=members)
         VirtualMoney = cls(id)
         await cls.execute(q)
         return VirtualMoney

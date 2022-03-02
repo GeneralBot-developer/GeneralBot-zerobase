@@ -1,6 +1,7 @@
 import asyncio
 
 from GBot.core import GeneralBotCore
+from GBot.data.voice import VoiceState
 import nextcord
 from nextcord.ext import commands
 from nextcord.ext.commands import Context
@@ -143,7 +144,11 @@ class Music_Player(commands.Cog):
         if ctx.author.voice is None:
             await ctx.reply("あなたはボイスチャンネルに接続していません。")
             return
+        if self.bot.voice[ctx.guild.id] == VoiceState.YOMIAGE or VoiceState.MUSIC:
+            await ctx.reply("現在使用中です。")
+            return
         if ctx.guild.voice_client is None:
+            self.bot.voice[ctx.guild.id] = VoiceState.MUSIC
             await ctx.author.voice.channel.connect()
             await ctx.reply("接続しました。")
         await self.register_queue(ctx, url)
@@ -155,6 +160,9 @@ class Music_Player(commands.Cog):
         help="再生を停止します。"
     )
     async def stop(self, ctx):
+        if self.bot.voice[ctx.guild.id] == VoiceState.NOT_PLAYED:
+            await ctx.reply("接続していません。")
+        self.bot.voice[ctx.guild.id] = VoiceState.NOT_PLAYED
         ctx.voice_client.stop()
         await ctx.reply("停止しました。")
 
