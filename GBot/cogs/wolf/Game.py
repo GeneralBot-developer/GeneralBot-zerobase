@@ -1,48 +1,39 @@
 import random
+from .Wolfpoll import Wolf_Execution_Poll
+from discord.ext.ui import ViewTracker, MessageProvider
 
 
 class WolfGame:
     def __init__(self, guild_id):
-        self.entry = []
+        self.entry_users = []
         self.guild_id = guild_id
-        self.users = []
+        self.alive_users = []
         self.wolf_id = []
+        self.playing_channel: int
 
-    def join(self, user_id: int):
-        self.users.append(user_id)
+    def game_join(self, user_id, channel_id):
+        self.playing_channel = channel_id
+        self.entry_users.append(user_id)
 
-    def leave(self, user_id: int):
-        self.entry.remove(user_id)
+    def game_leave(self, user_id):
+        self.playing_channel = None
+        self.entry_users.remove(user_id)
 
-    def start(self):
-        if len(self.users) < 3:
-            return "人数が不足しています：人数は3人以上にしてください。"
+    # 参加人数によって人狼の数を変動させる
+    def game_start(self):
+        if len(self.entry_users) < 5:
+            return "エントリー人数が足りません"
+        if len(self.entry_users) <= 5:
+            self.wolf_id = random.sample(self.entry_users, 1)
+        else:
+            self.wolf_id = random.sample(self.entry_users, 2)
+        self.alive_users = self.entry_users.copy()
+        self.entry_users.clear()
 
-        self.wolf_id = random.choice(self.users)
-
-        return f"{self.wolf_id} が狼です。"
-
-    def is_wolf(self, user_id: int):
-        return self.wolf_id == user_id
-
-    def is_alive(self, user_id: int):
-        return user_id in self.users
-
-    def is_dead(self, user_id: int):
-        return user_id not in self.users
-
-    def kill(self, user_id: int):
-        self.leave(user_id)
-
-    def is_wolf_alive(self):
-        return self.wolf_id in self.users
-
-    def is_wolf_dead(self):
-        return self.wolf_id not in self.users
-
-    def kill_wolf(self):
-        self.leave(self.wolf_id)
-
-    def is_wolf_kill_wolf(self):
-        return self.wolf_id == self.wolf_id
-
+    async def game_execution_vote(self):
+        view = Wolf_Execution_Poll(self.bot, self.alive_users)
+        tracker = ViewTracker(view, timeout=None)
+        await tracker.track(
+            MessageProvider(self.bot.get_channel(self.playing_channel)
+                            )
+        )

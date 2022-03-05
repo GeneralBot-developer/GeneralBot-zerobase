@@ -52,6 +52,7 @@ captcha = "*"
 yapf = "*"
 nextcord = {extras = ["voice"], ref = "master", git = "https://github.com/nextcord/nextcord/"}
 onami = "*"
+discord-ext-ui = "*"
 
 [dev-packages]
 flake8 = "*"
