@@ -2,15 +2,15 @@ import os
 import sys
 
 from GBot.CRUD.guild import Guild
+import discord
+from discord import app_commands, Object, Interaction, ui
 
-from nextcord.ext.commands import (
-    Cog, command, group,
-    has_permissions, is_owner, Context
-)
-from nextcord.ext.commands.errors import (
+from discord.ext.commands import (
+    Cog, command, group, has_permissions,
+    is_owner, Context,)
+from discord.ext.commands.errors import (
     MissingPermissions,
-    MissingRequiredArgument
-)
+    MissingRequiredArgument)
 from GBot.core import GeneralBotCore
 
 
@@ -54,5 +54,31 @@ class BotUtility(Cog):
         os.execl(python, python, *sys.argv)
 
 
-def setup(bot):
+class PrefixModal(ui.Modal, title="Prefixを変更"):
+    prefix = ui.TextInput(label="新しいPrefix名", default="g!", max_length=8)
+
+    async def on_submit(self, inter: discord.Interaction):
+        guild = await Guild(inter.guild.id).get()
+        await Guild(inter.guild.id).set(prefix=str(self.prefix))
+        await inter.response.send_message(f"Prefixを{guild.prefix}から{self.prefix}に変更しました")
+
+
+class Slash_Command_BotUtils(Cog, app_commands.Group):
+    def __init__(self, bot):
+        super().__init__(name="utils", description="Botに関する設定")
+        self.bot = bot
+
+    @app_commands.command(name="prefix", description="prefixを変更します")
+    async def slash_change_prefix(self, inter: Interaction):
+        modal = PrefixModal()
+        await inter.response.send_modal(modal)
+
+    @app_commands.command(name="ping", description="ping値を取得します")
+    async def slash_ping(self, inter: Interaction):
+        await inter.response.send_message(f"Pong! {round(self.bot.latency * 1000)}ms.")
+
+
+def setup(bot: GeneralBotCore):
     bot.add_cog(BotUtility(bot))
+    bot.add_cog(Slash_Command_BotUtils(bot))
+    bot.tree.add_command(Slash_Command_BotUtils(bot), guild=Object(id=878265923709075486))

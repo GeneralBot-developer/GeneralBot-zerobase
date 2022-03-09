@@ -1,13 +1,14 @@
-from nextcord.ext import commands
+from discord.ext import commands
 from GBot.CRUD.auth import Auth
 from GBot.CRUD.guild import Guild
 import string
 import secrets
 from captcha.image import ImageCaptcha
-import nextcord
+import discord
 
 
 class user_auth(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -40,8 +41,7 @@ class user_auth(commands.Cog):
         await Guild(ctx.guild.id).set(
             auth=on_off,
             auth_ch=ctx.channel.id,
-            auth_role=auth_role
-            )
+            auth_role=auth_role)
         await ctx.send(f"認証を{'有効化' if on_off else '無効化'}しました。")
 
     @commands.Cog.listener()
@@ -53,8 +53,12 @@ class user_auth(commands.Cog):
         else:
             passcord = self.get_random_password_string(4)
             await Auth.create(user_id=member.id, passcord=passcord)
-            file = nextcord.File(self.create_passimage(passcord), filename="captcha.png")
-            await channel.send(content=f"<@{member.id}> パスコード認証をしてください。", file=file)
+            file = discord.File(self.create_passimage(passcord),
+                                filename="captcha.png")
+            await channel.send(
+                content=f"<@{member.id}> パスコード認証をしてください。",
+                file=file
+            )
 
     @commands.Cog.listener()
     async def on_member_leave(self, member):
@@ -70,10 +74,6 @@ class user_auth(commands.Cog):
         auth = await Auth(message.author.id).get()
         if not guild.auth:
             return
-        elif not guild.auth:
-            return
-        else:
-            pass
         if message.author.bot:
             return
         elif message.channel.id != guild.auth_ch:
@@ -83,14 +83,20 @@ class user_auth(commands.Cog):
         if not auth:
             return
         if message.content == auth.passcord:
-            await message.channel.send(f"<@{message.author.id}> パスコード認証に成功しました。")
+            await message.channel.send(
+                f"<@{message.author.id}> パスコード認証に成功しました。")
             await Auth(message.author.id).delete()
             role = self.bot.get_role(guild.auth_role)
             await message.author.add_roles(role)
         else:
-            await message.channel.send(f"<@{message.author.id}> パスコード認証に失敗しました。")
+            await message.channel.send(
+                f"<@{message.author.id}> パスコード認証に失敗しました。")
 
-    @auth.command(name="change", aliases=["changepass"], help="ロールIDとチャンネルIDを変更します。")
+    @auth.command(
+        name="change",
+        aliases=["changepass"],
+        help="ロールIDとチャンネルIDを変更します。"
+    )
     async def guild_setting_change(self, ctx, column, value):
         guild = await Guild(ctx.guild.id).get()
         if not guild.auth:

@@ -1,6 +1,4 @@
 import random
-from .Wolfpoll import Wolf_Execution_Poll
-from discord.ext.ui import ViewTracker, MessageProvider
 
 
 class WolfGame:
@@ -31,9 +29,4 @@ class WolfGame:
         self.entry_users.clear()
 
     async def game_execution_vote(self):
-        view = Wolf_Execution_Poll(self.bot, self.alive_users)
-        tracker = ViewTracker(view, timeout=None)
-        await tracker.track(
-            MessageProvider(self.bot.get_channel(self.playing_channel)
-                            )
-        )
+        pass

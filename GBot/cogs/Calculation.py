@@ -1,13 +1,8 @@
-from nextcord.ext import commands
+from discord.ext import commands
 
 DEBUG = False
 
-
-char_dct = {
-    "1", "2", "3", "4", "5",
-    "6", "7", "8", "9", "0",
-    "."
-}
+char_dct = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "."}
 
 pos = 0
 
@@ -78,14 +73,13 @@ def number(line):
 
 
 class Calculation(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(
-        name="calc",
-        aliases=["calculate"],
-        help="""<formula>に計算式を入れると計算します。\n例：calc 1+2*3=7\n"""
-        )
+    @commands.command(name="calc",
+                      aliases=["calculate"],
+                      help="""<formula>に計算式を入れると計算します。\n例：calc 1+2*3=7\n""")
     async def calc(self, ctx, formula):
         try:
             await ctx.send(myeval(formula))
