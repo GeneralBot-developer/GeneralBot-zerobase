@@ -35,11 +35,11 @@ class moderation(Cog):
 
     @has_guild_permissions(administrator=True)
     @group(name="automoderation", aliases=["am"], help="自動モデレーションの設定を行います")
-    async def automoderation(self, ctx):
+    async def automoderation_group(self, ctx):
         if ctx.invoked_subcommand is None:
             return
 
-    @automoderation.command(name="setting",
+    @automoderation_group.command(name="setting",
                             aliases=["set"],
                             help="自動モデレーションを有効化、または無効化します")
     async def automoderation_setting(self, ctx, enable: bool):
@@ -51,7 +51,7 @@ class moderation(Cog):
                 await ctx.reply("既に無効化されています。")
         await ctx.send(f"自動モデレーションを{'有効' if enable else '無効'}にしました。")
 
-    @automoderation.command(name="ignore_channel",
+    @automoderation_group.command(name="ignore_channel",
                             aliases=["ignore"],
                             help="自動モデレーションを除外するチャンネルを設定します")
     async def automoderation_ignore_channel(self, ctx, channel: int):
@@ -60,7 +60,7 @@ class moderation(Cog):
             await ctx.reply("既に除外されています。")
         await ctx.send(f"{channel} を除外しました。")
 
-    @automoderation.command(name="ignore_role",
+    @automoderation_group.command(name="ignore_role",
                             aliases=["ignore"],
                             help="自動モデレーションを除外するロールを設定します")
     async def automoderation_ignore_role(self, ctx, role: int):
@@ -69,9 +69,10 @@ class moderation(Cog):
             await ctx.reply("既に除外されています。")
         await ctx.send(f"{role} を除外しました。")
 
-    @automoderation.command(name="ignore_user",
-                            aliases=["ignore"],
-                            help="自動モデレーションを除外するユーザーを設定します")
+    @automoderation_group.command(
+        name="ignore_user",
+        aliases=["ignore"],
+        help="自動モデレーションを除外するユーザーを設定します")
     async def automoderation_ignore_user(self, ctx, user: int):
         guild = await Guild(ctx.guild.id).get()
         if user in guild.automoderation_ignore_users:

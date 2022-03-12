@@ -79,7 +79,7 @@ class Bulletin_Board_System(commands.Cog):
     async def private_message_send(self, message):
         if message.author.bot:
             return
-        bbs = await BBS.get_all()
+        bbs = await BBS(message.author.id).get()
         if not bbs:
             return
         for b in bbs:

@@ -16,7 +16,7 @@ class HelpCommand(commands.HelpCommand):
                     name=cog.qualified_name,
                     value="\n".join([
                         f"```{command.name} - {command.short_doc}```"
-                        for command in cog.get_commands()
+                        if not command.short_doc else f"```{command.name}```"for command in cog.get_commands()
                     ]),
                     inline=False)
             elif cog is None:
@@ -24,9 +24,11 @@ class HelpCommand(commands.HelpCommand):
         await self.get_destination().send(embed=embed)
 
     async def send_cog_help(self, cog):
-        embed = discord.Embed(title=f"{cog.qualified_name}のコマンド一覧",
-                              description=" ",
-                              color=0x00ff00)
+        embed = discord.Embed(
+            title=f"{cog.qualified_name}のコマンド一覧",
+            description=" ",
+            color=0x00ff00
+        )
         for command in cog.get_commands():
             embed.add_field(
                 name=command.name,
@@ -45,9 +47,10 @@ class HelpCommand(commands.HelpCommand):
         return self.context.bot.commands
 
     async def command_not_found(self, string):
-        embed = discord.Embed(title="コマンドが見つかりませんでした。",
-                              description=f"{string}",
-                              color=0xff0000)
+        embed = discord.Embed(
+            title="コマンドが見つかりませんでした。",
+            description=f"{string}",
+            color=0xff0000)
         command_list = []
         cmds = self.get_commands()
         for command in cmds:
@@ -66,9 +69,17 @@ class HelpCommand(commands.HelpCommand):
         await self.get_destination().send(embed=error)
 
     async def send_group_help(self, group):
-        embed = discord.Embed(title=f"{group.qualified_name}のサブコマンド",
-                              description=" ",
-                              color=0x00ff00)
+        embed = discord.Embed(
+            title=f"{group.qualified_name}のサブコマンド",
+            description=" ",
+            color=0x00ff00
+        )
         for command in group.commands:
-            embed.add_field(name=command.name, value=command.short_doc)
+            embed.add_field(
+                name=command.name,
+                value=[
+                    command.short_doc
+                    if not command.short_doc else "None"
+                ]
+            )
         await self.get_destination().send(embed=embed)

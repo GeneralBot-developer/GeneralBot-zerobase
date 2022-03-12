@@ -10,7 +10,6 @@ from GBot.functions.help import HelpCommand
 import discord
 from discord.ext.commands import Bot
 from discord.ext.commands.errors import MissingPermissions, CommandNotFound, NotOwner
-
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
 
@@ -32,7 +31,6 @@ class GeneralBotCore(Bot):
         self.voice = {}
         self.voice: Dict[int, Set[VoiceState]]
         self.token = token
-        self.tree = discord.app_commands.CommandTree(self)
         self.load_cogs()
 
     async def is_owner(self, user: discord.User):
@@ -43,10 +41,12 @@ class GeneralBotCore(Bot):
     def load_cogs(self):
         cog_files = [
             "Utils", "RoleKeeper", "screenshot", "music_player", "Calculation",
-            "tts", "virtual_money", "crypto", "auth"
+            "tts", "virtual_money", "crypto", "auth", "wolf.__init__"
         ]
         for cog in cog_files:
-            super().load_extension(f"GBot.cogs.{cog}")
+            super().load_extension(
+                f"GBot.cogs.{cog[:-3] if cog.endswith('.py') else cog}"
+            )
             LOG.info(f"{cog}のロード完了。")
         if self.jishaku:
             super().load_extension("jishaku")
@@ -152,6 +152,7 @@ class GeneralBotCore(Bot):
         except discord.LoginFailure:
             print("Discord Tokenが不正です")
         except KeyboardInterrupt:
+            self._connection._command_tree = None
             LOG.error("終了します")
             self.loop.run_until_complete(self.close())
         else:
