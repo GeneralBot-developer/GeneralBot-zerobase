@@ -8,11 +8,17 @@ from GBot.CRUD.virtual import VirtualMoney
 
 from GBot.CRUD.guild import Guild
 from GBot.functions.help import HelpCommand
+<<<<<<< HEAD
 
 sys.path.append(r"c:\users\kou\.virtualenvs\generalbot-zerobase-k-5rsmb3\lib\site-packages")
 import nextcord
 from nextcord.ext.commands import Bot
 from nextcord.ext.commands.errors import MissingPermissions, CommandNotFound, NotOwner
+=======
+import discord
+from discord.ext.commands import Bot
+from discord.ext.commands.errors import MissingPermissions, CommandNotFound, NotOwner
+>>>>>>> parent of 90152f0 (update: 結構できてきた。)
 
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
@@ -32,6 +38,7 @@ class GeneralBotCore(Bot):
         self.voice = {}
         self.voice: Dict[int, Set[VoiceState]]
         self.token = token
+        self.tree = discord.app_commands.CommandTree(self)
         self.load_cogs()
 
     async def is_owner(self, user: nextcord.User):
@@ -41,6 +48,7 @@ class GeneralBotCore(Bot):
 
     def load_cogs(self):
         cog_files = [
+<<<<<<< HEAD
             "Utils",
             "RoleKeeper",
             "screenshot",
@@ -50,6 +58,10 @@ class GeneralBotCore(Bot):
             "virtual_money",
             "crypto",
             "auth"
+=======
+            "Utils", "RoleKeeper", "screenshot", "music_player", "Calculation",
+            "tts", "virtual_money", "crypto", "auth"
+>>>>>>> parent of 90152f0 (update: 結構できてきた。)
         ]
         for cog in cog_files:
             super().load_extension(f"GBot.cogs.{cog}")

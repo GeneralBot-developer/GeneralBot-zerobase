@@ -17,6 +17,7 @@ class HelpCommand(commands.HelpCommand):
             if isinstance(cog, commands.Cog):
                 embed.add_field(
                     name=cog.qualified_name,
+<<<<<<< HEAD
                     value="\n".join(
                         [
                             f"```{command.name} - {command.short_doc}```"
@@ -25,16 +26,29 @@ class HelpCommand(commands.HelpCommand):
                     ),
                     inline=False
                 )
+=======
+                    value="\n".join([
+                        f"```{command.name} - {command.short_doc}```"
+                        for command in cog.get_commands()
+                    ]),
+                    inline=False)
+>>>>>>> parent of 90152f0 (update: 結構できてきた。)
             elif cog is None:
                 pass
         await self.get_destination().send(embed=embed)
 
     async def send_cog_help(self, cog):
+<<<<<<< HEAD
         embed = nextcord.Embed(
             title=f"{cog.qualified_name}のコマンド一覧",
             description=" ",
             color=0x00ff00
         )
+=======
+        embed = discord.Embed(title=f"{cog.qualified_name}のコマンド一覧",
+                              description=" ",
+                              color=0x00ff00)
+>>>>>>> parent of 90152f0 (update: 結構できてきた。)
         for command in cog.get_commands():
             embed.add_field(
                 name=command.name,
@@ -54,11 +68,17 @@ class HelpCommand(commands.HelpCommand):
         return self.context.bot.commands
 
     async def command_not_found(self, string):
+<<<<<<< HEAD
         embed = nextcord.Embed(
             title="コマンドが見つかりませんでした。",
             description=f"{string}",
             color=0xff0000
         )
+=======
+        embed = discord.Embed(title="コマンドが見つかりませんでした。",
+                              description=f"{string}",
+                              color=0xff0000)
+>>>>>>> parent of 90152f0 (update: 結構できてきた。)
         command_list = []
         cmds = self.get_commands()
         for command in cmds:
@@ -78,6 +98,7 @@ class HelpCommand(commands.HelpCommand):
         await self.get_destination().send(embed=error)
 
     async def send_group_help(self, group):
+<<<<<<< HEAD
         embed = nextcord.Embed(
             title=f"{group.qualified_name}のサブコマンド",
             description=" ",
@@ -88,4 +109,11 @@ class HelpCommand(commands.HelpCommand):
                 name=command.name,
                 value=command.short_doc
             )
+=======
+        embed = discord.Embed(title=f"{group.qualified_name}のサブコマンド",
+                              description=" ",
+                              color=0x00ff00)
+        for command in group.commands:
+            embed.add_field(name=command.name, value=command.short_doc)
+>>>>>>> parent of 90152f0 (update: 結構できてきた。)
         await self.get_destination().send(embed=embed)
