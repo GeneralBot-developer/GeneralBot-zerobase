@@ -38,8 +38,8 @@ auth = Table(
 bbs = Table(
     "bbs",
     meta,
-    Column("title", String(255), nullable=False, primary_key=True),
-    Column("author", BigInteger(), nullable=False),
+    Column("title", String(255), nullable=False),
+    Column("author", BigInteger(), nullable=False, primary_key=True),
     Column("content", String(1024), nullable=False),
     Column("created_at", DateTime(), nullable=False),
     Column("updated_at", DateTime(), nullable=True),
