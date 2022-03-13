@@ -1,3 +1,4 @@
+[[source]]
 url = "https://pypi.org/simple"
 verify_ssl = true
 name = "pypi"
@@ -21,6 +22,7 @@ mecab-python3 = "*"
 pydub = "*"
 flake8 = "*"
 autopep8 = "*"
+pywatcher = "*"
 
 [dev-packages]
 alembic = "*"

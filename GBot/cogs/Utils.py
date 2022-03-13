@@ -2,6 +2,8 @@ import os
 import sys
 
 from GBot.CRUD.guild import Guild
+import discord
+from discord import app_commands, Object, Interaction, ui
 
 from discord.ext.commands import (
     Cog, command, group,
@@ -10,8 +12,7 @@ from discord.ext.commands import (
 import discord
 from discord.ext.commands.errors import (
     MissingPermissions,
-    MissingRequiredArgument
-)
+    MissingRequiredArgument)
 from GBot.core import GeneralBotCore
 
 
@@ -56,12 +57,30 @@ class BotUtility(Cog):
 
 
 class PrefixModal(ui.Modal, title="Prefixを変更"):
-    prefix = ui.TextInput(label="新しいPrefix名", default="g!", max_length=8)
+    prefix = ui.TextInput(label="新しいPrefix名", default="g!", max_length=8, required=True)
 
     async def on_submit(self, inter: discord.Interaction):
-        guild = await Guild(inter.guild.id).get()
-        await Guild(inter.guild.id).set(prefix=str(self.prefix))
-        await inter.response.send_message(f"Prefixを{guild.prefix}から{self.prefix}に変更しました")
+        if str(inter.guild.owner.id) == str(inter.user.id):
+            guild = await Guild(inter.guild.id).get()
+            await Guild(inter.guild.id).set(prefix=str(self.prefix))
+            await inter.response.send_message(f"Prefixを{guild.prefix}から{self.prefix}に変更しました")
+        else:
+            await inter.response.send_message("管理者のみが実行可能です")
+
+
+class Test_Button(discord.ui.Button):
+    def __init__(self, bot: GeneralBotCore):
+        super().__init__(label="Ping!")
+        self.bot = bot
+
+    async def callback(self, inter: discord.Interaction):
+        await inter.response.edit_message(content=f"Pong! {round(self.bot.latency * 1000)}ms.", view=None)
+
+
+class Test_View(discord.ui.View):
+    def __init__(self, item):
+        super().__init__()
+        self.add_item(item)
 
 
 class Slash_Command_BotUtils(Cog, app_commands.Group):
@@ -76,8 +95,10 @@ class Slash_Command_BotUtils(Cog, app_commands.Group):
 
     @app_commands.command(name="ping", description="ping値を取得します")
     async def slash_ping(self, inter: Interaction):
-        await inter.response.send_message(f"Pong! {round(self.bot.latency * 1000)}ms.")
+        await inter.response.send_message(view=Test_View(Test_Button(self.bot)))
 
 
 def setup(bot: GeneralBotCore):
     bot.add_cog(BotUtility(bot))
+    bot.add_cog(Slash_Command_BotUtils(bot))
+    bot.tree.add_command(Slash_Command_BotUtils(bot), guild=Object(id=878265923709075486))

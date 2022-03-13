@@ -1,10 +1,11 @@
-from nextcord.ext.commands import Cog, command, Context
+from discord.ext.commands import Cog, command, Context
 from GBot.core import GeneralBotCore
-from nextcord import File
+from discord import File
 from pyppeteer import launch
 
 
 class ScreenShot(Cog):
+
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
 

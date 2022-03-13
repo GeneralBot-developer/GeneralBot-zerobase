@@ -1,9 +1,10 @@
-from nextcord.ext import commands
+from discord.ext import commands
 from GBot.CRUD.bbs import BBS
 from GBot.core.bot import team_id
 
 
 class Bulletin_Board_System(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -13,15 +14,18 @@ class Bulletin_Board_System(commands.Cog):
             return
 
     @bbs.command(name="create", aliases=["c"], help="掲示板を作ります。")
-    async def bbs_create(self, ctx: commands.Context, title: str, content: str):
+    async def bbs_create(
+            self,
+            ctx: commands.Context,
+            title: str,
+            content: str):
         channel = [].append(ctx.channel.id)
         created_bbs = await BBS.create(
             title=title,
             content=content,
             author=ctx.author.id,
             create_at=ctx.message.created_at,
-            using_channels=channel
-        )
+            using_channels=channel)
         await ctx.reply(f"{created_bbs.title}を作成しました。")
 
     @bbs.command(name="delete", aliases=["d"], help="掲示板を削除します。")
@@ -75,7 +79,7 @@ class Bulletin_Board_System(commands.Cog):
     async def private_message_send(self, message):
         if message.author.bot:
             return
-        bbs = await BBS.get_all()
+        bbs = await BBS(message.author.id).get()
         if not bbs:
             return
         for b in bbs:

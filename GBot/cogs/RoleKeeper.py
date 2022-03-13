@@ -1,8 +1,8 @@
-from nextcord.ext.commands import Cog, group, Context
+from discord.ext.commands import Cog, group, Context
 from GBot.core import GeneralBotCore
 import json
 import aiofile
-import nextcord
+import discord
 import asyncio
 
 
@@ -12,7 +12,7 @@ class RoleKeep(Cog):
         self.json_path = "GBot/data/role_keep.json"
 
     @Cog.listener()
-    async def on_member_leave(self, member: nextcord.Member):
+    async def on_member_leave(self, member: discord.Member):
         async with aiofile.async_open(self.json_path, mode="r") as f:
             content = await f.read()
         if member.guild.id not in content:
@@ -30,14 +30,12 @@ class RoleKeep(Cog):
             roles.append(role.id)
         convert_roles = json.dumps(roles)
         content = json.loads(content)
-        content[member.guild.id] = {
-            member.id: convert_roles
-        }
+        content[member.guild.id] = {member.id: convert_roles}
         async with aiofile.async_open(self.json_path, mode="w") as f:
             await f.write(json.dumps(content, indent=4))
 
     @Cog.listener()
-    async def on_member_join(self, member: nextcord.Member):
+    async def on_member_join(self, member: discord.Member):
         async with aiofile.async_open(self.json_path, mode="r") as f:
             content = await f.read()
         content = json.loads(content)
