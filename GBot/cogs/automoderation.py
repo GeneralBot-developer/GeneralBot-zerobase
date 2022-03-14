@@ -79,24 +79,6 @@ class moderation(Cog):
             await ctx.reply("既に除外されています。")
         await ctx.send(f"{user} を除外しました。")
 
-    @Cog.listener("on_message")
-    async def delete_duplicate_message(self, message):
-        if message.author.bot:
-            return
-        guild = await Guild(message.guild.id).get()
-        if guild.automoderation:
-            if message.channel.id in guild.automoderation_ignore_channels:
-                return
-            if message.author.id in guild.automoderation_ignore_users:
-                return
-            if message.author.id in guild.automoderation_ignore_roles:
-                return
-            async for msg in message.channel.history(
-                    limit=guild.message_delete_limit):
-                if msg.content == message.content:
-                    await msg.delete()
-                    await message.delete()
-
 
 def setup(bot):
     bot.add_cog(moderation(bot))

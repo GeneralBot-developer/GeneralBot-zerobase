@@ -74,14 +74,14 @@ class user_auth(commands.Cog):
         auth = await Auth(message.author.id).get()
         if not guild.auth:
             return
-        if message.author.bot:
+        elif not auth:
+            return
+        elif message.author.bot:
             return
         elif message.channel.id != guild.auth_ch:
             return
         else:
             pass
-        if not auth:
-            return
         if message.content == auth.passcord:
             await message.channel.send(
                 f"<@{message.author.id}> パスコード認証に成功しました。")

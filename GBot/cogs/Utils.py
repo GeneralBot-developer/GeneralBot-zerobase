@@ -7,9 +7,8 @@ from discord import app_commands, Object, Interaction, ui
 
 from discord.ext.commands import (
     Cog, command, group,
-    has_permissions, is_owner, Context, app_commands, ui, Interaction
+    has_permissions, is_owner, Context
 )
-import discord
 from discord.ext.commands.errors import (
     MissingPermissions,
     MissingRequiredArgument)

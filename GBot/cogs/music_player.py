@@ -88,13 +88,14 @@ class Music_Player(commands.Cog):
 
     async def register_queue(self, ctx: Context, url):
         print(ctx, url)
-        source = await YTDLSource.from_url(url,
-                                           loop=self.bot.loop,
-                                           stream=True)
+        source = await YTDLSource.from_url(
+            url,
+            loop=self.bot.loop,
+            stream=True
+        )
         if ctx.guild.id not in self.queue:
             self.queue[ctx.guild.id] = []
         self.queue[ctx.guild.id].append(source)
-        print(self.queue)
         return self.queue[ctx.guild.id]
 
     async def play_only(self, ctx: Context):
@@ -123,11 +124,10 @@ class Music_Player(commands.Cog):
         if ctx.author.voice is None:
             await ctx.reply("あなたはボイスチャンネルに接続していません。")
             return
-        if self.bot.voice[
-                ctx.guild.id] == VoiceState.YOMIAGE or VoiceState.MUSIC:
-            await ctx.reply("現在使用中です。")
-            return
         if ctx.guild.voice_client is None:
+            if not self.bot.voice[ctx.guild.id] == VoiceState.NOT_PLAYED:
+                await ctx.reply("使用中です。")
+                return
             self.bot.voice[ctx.guild.id] = VoiceState.MUSIC
             await ctx.author.voice.channel.connect()
             await ctx.reply("接続しました。")

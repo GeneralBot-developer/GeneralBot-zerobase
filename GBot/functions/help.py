@@ -1,26 +1,35 @@
 from discord.ext import commands
+from discord.ext.commands import Command, Cog
 import discord
 import Levenshtein
+from typing import List, Optional, Dict
 
 
 class HelpCommand(commands.HelpCommand):
-
     def __init__(self):
         super().__init__(command_attrs={"hidden": True})
 
-    async def send_bot_help(self, mapping):
-        embed = discord.Embed(title="コマンド一覧", description=" ", color=0x00ff00)
-        for cog in mapping:
-            if isinstance(cog, commands.Cog):
+    async def send_bot_help(self, mapping: Dict[Optional[Cog], List[Command]]):
+        embed = discord.Embed(
+            title="GBotのコマンド一覧",
+            description=" ",
+            color=0x00ff00
+        )
+        for cog, command in mapping.items():
+            if cog is None:
+                continue
+            if len(command) == 0:
+                continue
+            for command in command:
                 embed.add_field(
                     name=cog.qualified_name,
-                    value="\n".join([
-                        f"```{command.name} - {command.short_doc}```"
-                        if not command.short_doc else f"```{command.name}```"for command in cog.get_commands()
-                    ]),
-                    inline=False)
-            elif cog is None:
-                pass
+                    value="\n".join(
+                        [
+                            f"```{command.name}```-```{command.short_doc}```" if command.short_doc else "None" for command in cog.get_commands()
+                        ]
+                    ),
+                    inline=False
+                )
         await self.get_destination().send(embed=embed)
 
     async def send_cog_help(self, cog):

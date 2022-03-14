@@ -10,7 +10,7 @@ from GBot.functions.help import HelpCommand
 import discord
 from discord.ext.commands import Bot
 from discord.ext.commands.errors import MissingPermissions, CommandNotFound, NotOwner
-r
+
 basicConfig(level=INFO)
 LOG = getLogger(__name__)
 
@@ -32,7 +32,6 @@ class GeneralBotCore(Bot):
         self.voice = {}
         self.voice: Dict[int, Set[VoiceState]]
         self.token = token
-        self.tree = discord.app_commands.CommandTree(self)
         self.load_cogs()
 
     async def is_owner(self, user: discord.User):
@@ -66,7 +65,7 @@ class GeneralBotCore(Bot):
         guild = await Guild(message.guild.id).get()
         if guild:
             if guild.id == 878265923709075486:
-                if self.user.id == 899076159604686850:
+                if self.user.id == 950745689749602364:
                     print(f"サーバー:{message.guild.name}")
                     print("接頭文字:gc!")
                     return "gc!"
