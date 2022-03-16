@@ -23,6 +23,8 @@ pydub = "*"
 flake8 = "*"
 autopep8 = "*"
 pywatcher = "*"
+pandas = "*"
+google-api-python-client = "==1.9.3"
 
 [dev-packages]
 alembic = "*"

@@ -1,13 +1,18 @@
+# -*- coding: utf-8 -*-
 import asyncio
 
 from GBot.core import GeneralBotCore
 from GBot.data.voice import VoiceState
 import discord
+from discord import ui
 from discord.ext import commands
 from discord.ext.commands import Context
 import youtube_dl
 import datetime
 import random
+import os
+from apiclient.discovery import build
+from typing import List
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -55,14 +60,54 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data = data['entries'][0]
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options),
-                   data=data)
+        return cls(
+            discord.FFmpegPCMAudio(
+                filename,
+                **ffmpeg_options
+            ),
+            data=data
+        )
+
+
+class Music_View(ui.View):
+    def __init__(self, item):
+        super().__init__()
+        for i in item:
+            self.add_item(i)
+
+
+class Music_Select(ui.Select):
+    def __init__(self, args):
+        select_list: List[str] = []
+        for item in args:
+            select_list.append(
+                discord.SelectOption(
+                    label=item,
+                    description=''
+                )
+            )
+
+        super().__init__(
+            placeholder='',
+            min_values=1,
+            max_values=1,
+            options=select_list
+        )
+
+    async def callback(self, interaction: discord.Interaction):
+        await interaction.response.send_message(
+            f'{self.values[0]}を選択しました'
+        )
 
 
 class Music_Player(commands.Cog):
-
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
+        self.youtube = build(
+            'youtube',
+            'v3',
+            developerKey=os.environ["YOUTUBE_API_KEY"]
+        )
         self.queue = {}
 
     @commands.group(name="music", aliases=["m"], invoke_without_command=True)
@@ -76,6 +121,32 @@ class Music_Player(commands.Cog):
         h, m = divmod(m, 60)
         return h, m, s
 
+    def get_video_info(self, part, keyword, order, type):
+        video_list: List[dict] = []
+        video_infos: List[str] = []
+        search_response = self.youtube.search().list(
+            part=part,
+            q=keyword,
+            order=order,
+            type=type
+        )
+        output = self.youtube.search().list(
+            part=part,
+            q=keyword,
+            order=order,
+            type=type
+        ).execute()
+        for _ in range(2):
+            video_list.append(output["items"])
+            search_response = self.youtube.search().list_next(
+                search_response,
+                output
+            )
+            output = search_response.execute()
+        for video in video_list:
+            video_infos.append(video["snippet"]["title"])
+        return video_infos
+
     async def create_embed(self, source: YTDLSource):
         embed = discord.Embed(title="キューに追加...", color=0x00ff00)
         embed.add_field(name="曲名", value=source.title)
@@ -87,7 +158,18 @@ class Music_Player(commands.Cog):
         return embed
 
     async def register_queue(self, ctx: Context, url):
-        print(ctx, url)
+        if not url in "https":
+            search_result = self.get_video_info(
+                part="snippet",
+                keyword=url,
+                order="relevance",
+                type="video"
+            )
+            await 
+        else:
+            await self.create_music(ctx, url)
+
+    async def create_music(self, ctx, url):
         source = await YTDLSource.from_url(
             url,
             loop=self.bot.loop,
