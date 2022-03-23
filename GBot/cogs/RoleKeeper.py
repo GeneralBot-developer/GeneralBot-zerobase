@@ -82,5 +82,5 @@ class RoleKeep(Cog):
         await ctx.send("設定が完了しました。")
 
 
-def setup(bot: GeneralBotCore):
-    bot.add_cog(RoleKeep(bot))
+async def setup(bot: GeneralBotCore):
+    return await bot.add_cog(RoleKeep(bot))

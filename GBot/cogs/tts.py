@@ -294,5 +294,5 @@ class Text_To_Speech(commands.Cog):
         await self.play_only(ctx)
 
 
-def setup(bot):
-    bot.add_cog(Text_To_Speech(bot))
+async def setup(bot):
+    return await bot.add_cog(Text_To_Speech(bot))

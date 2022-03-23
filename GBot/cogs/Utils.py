@@ -97,7 +97,10 @@ class Slash_Command_BotUtils(Cog, app_commands.Group):
         await inter.response.send_message(view=Test_View(Test_Button(self.bot)))
 
 
-def setup(bot: GeneralBotCore):
-    bot.add_cog(BotUtility(bot))
-    bot.add_cog(Slash_Command_BotUtils(bot))
-    bot.tree.add_command(Slash_Command_BotUtils(bot), guild=Object(id=878265923709075486))
+async def setup(bot: GeneralBotCore):
+    await bot.add_cog(BotUtility(bot))
+    await bot.add_cog(Slash_Command_BotUtils(bot))
+    bot.tree.add_command(
+        Slash_Command_BotUtils(bot),
+        guild=Object(id=878265923709075486)
+    )

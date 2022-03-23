@@ -148,5 +148,5 @@ class VMoney(commands.Cog):
         await ctx.reply(embed=embed)
 
 
-def setup(bot):
-    return bot.add_cog(VMoney(bot))
+async def setup(bot):
+    return await bot.add_cog(VMoney(bot))

@@ -121,5 +121,5 @@ class user_auth(commands.Cog):
             return await ctx.reply("変更する項目を指定してください。")
 
 
-def setup(bot):
-    bot.add_cog(user_auth(bot))
+async def setup(bot):
+    return await bot.add_cog(user_auth(bot))
