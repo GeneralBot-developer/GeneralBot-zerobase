@@ -3,6 +3,7 @@ import discord
 import asyncio
 from typing import Dict, List
 import random
+from discord.ext.commands import Context
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -25,27 +26,24 @@ ffmpeg_options = {'options': '-vn'}
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
 
-
 class YTDLSource(discord.PCMVolumeTransformer):
+
     def __init__(self, source, *, data, volume=0.5):
         super().__init__(source, volume)
+
         self.data = data
-        self.title = data.get('title')
-        self.url = data.get('url')
-        self.duration = data.get('duration')
+        self.title: str = data.get('title')
+        self.url: str = data.get('url')
         self.thumbnail = data.get('thumbnail')
+        self.duration: int = data.get('duration')
         self.channel: str = data.get('channel')
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False) -> 'YTDLSource':
+    async def from_url(cls, url, *, loop=None, stream=False):
+        print(url)
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(
-            None,
-            lambda: ytdl.extract_info(
-                url,
-                download=not stream
-            )
-        )
+            None, lambda: ytdl.extract_info(url, download=not stream))
 
         if 'entries' in data:
             # take first item from a playlist
@@ -53,38 +51,51 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(
-            discord.FFmpegPCMAudio(filename,
-                                   **ffmpeg_options), data=data
+            discord.FFmpegPCMAudio(
+                filename,
+                **ffmpeg_options
+            ),
+            data=data
         )
 
 
 class Player:
-    player_list: Dict[int: "Player"] = {}
+    player_list: Dict[int, "Player"]
 
-    def __init__(self, guild_id, voice_client: discord.VoiceClient, loop=None):
-        self.guild_id: int = guild_id
-        self.voice_client = voice_client
+    def __init__(
+            self,
+            guild_id: int,
+            loop=None
+    ):
+        self.guild_id = guild_id
         self.queue: List[YTDLSource] = []
         self.current_song: YTDLSource = None
         self.loop: asyncio.AbstractEventLoop = loop
         self.repeat: bool = False
-        self.player_list[guild_id] = self
 
     def get_h_m_s(td) -> str:
         m, s = divmod(td.seconds, 60)
         h, m = divmod(m, 60)
         return h, m, s
 
-    def get(self) -> bool:
-        if self.player_list.get(self.guild_id) is None:
+    @classmethod
+    def found(cls, guild_id: int) -> bool:
+        if cls.player_list.get(guild_id) is None:
             return False
         else:
             return True
 
+    @classmethod
+    def get(cls, guild_id: int) -> "Player":
+        player = cls.player_list.get(guild_id)
+        if player is None:
+            return None
+        return player
+
     # YTDLSouce.from_urlで取得したdataをqueueに追加
-    def queue_add(self, url: str, loop=None):
+    async def queue_add(self, url: str, loop=None):
         loop = loop or asyncio.get_event_loop()
-        data = YTDLSource.from_url(url, loop=loop)
+        data = await YTDLSource.from_url(url, loop=loop, stream=True)
         self.queue.append(data)
 
     def queue_remove(self, index: int):
@@ -106,7 +117,7 @@ class Player:
         return self.queue.index(self.current_song)
 
     # dataを元にタイトル、URL、時間、サムネイルを含むdiscord.Embedを作成
-    def create_embed(self, data: YTDLSource, is_playing: bool = False)-> discord.Embed:
+    def create_embed(self, data: YTDLSource, is_playing: bool = False) -> discord.Embed:
         if is_playing:
             status = "キューに追加"
         else:
@@ -116,54 +127,61 @@ class Player:
             url=data.url,
             color=0x00ff00
         )
-        embed.set_thumbnail(url=data.thumbnail)
+        embed.set_image(url=data.thumbnail)
         embed.set_author(name=data.channel)
         embed.set_footer(text=f'{data.duration}')
         return embed
 
-    async def after_playback(self, ctx: discord.commands.Context):
+    async def after_playback(self, ctx: Context):
         if self.repeat:
-            self.play()
+            await self.play(ctx)
         else:
-            self.queue[self.guild_id].pop(-1)
+            self.queue[self.guild_id].pop()
             if len(self.queue[self.guild_id]) > 0:
-                self.play()
+                await self.play(ctx)
             else:
                 self.current_song = None
-                self.voice_client.stop()
+                ctx.guild.voice_client.stop()
                 await ctx.send("再生を停止しました。")
 
-    async def play(self, ctx: discord.commands.Context):
-        self.current_song = self.queue[-1]
+    async def play(self, ctx: Context):
+        print(ctx)
+        self.current_song = self.queue[:-1]
         embed = self.create_embed(
             self.current_song,
-            self.voice_client.is_playing()
+            ctx.guild.voice_client.is_playing()
         )
         await ctx.send(embed=embed)
-        self.voice_client.play(
+        ctx.guild.voice_client.play(
             self.current_song,
             after=lambda _: self.loop.create_task(
                 self.after_playback(ctx)
             )
         )
 
-    def stop(self):
+    def leave(self, ctx: Context):
         self.current_song = None
-        self.voice_client.stop()
+        ctx.guild.voice_client.stop()
+        ctx.guild.voice_client.disconnect()
+        self.player_list.pop(self.guild_id)
 
-    def pause(self):
-        self.voice_client.pause()
+    def stop(self, ctx: Context):
+        self.current_song = None
+        ctx.guild.voice_client.stop()
 
-    def resume(self):
-        self.voice_client.resume()
+    def pause(self, ctx: Context):
+        ctx.guild.voice_client.pause()
 
-    def skip(self):
+    def resume(self, ctx: Context):
+        ctx.guild.voice_client.resume()
+
+    def skip(self, ctx: Context):
         self.queue.pop(-1)
-        self.voice_client.stop()
+        ctx.guild.voice_clientvoice_client.stop()
 
-    def queue_clear(self):
+    def queue_clear(self, ctx: Context):
         self.queue = []
-        self.voice_client.stop()
+        ctx.guild.voice_client.stop()
 
     def queue_list(self) -> discord.Embed:
         embed = discord.Embed(
@@ -193,11 +211,20 @@ class Player:
     def queue_shuffle(self):
         random.shuffle(self.queue)
 
-    def volume(self, volume: int):
-        self.voice_client.source.volume = volume
+    def volume(self, ctx: Context, volume: int):
+        ctx.guild.voice_client.source.volume = volume
+
+    def leave(self, ctx: Context):
+        self.player_list.pop(self.guild_id)
+        ctx.guild.voice_client.stop()
+        ctx.guild.voice_client.disconnect()
 
     @classmethod
     def create(cls, **kwargs):
         self = cls(**kwargs)
         self.player_list[self.guild_id] = self
         return self
+
+    @staticmethod
+    def player_list_get() -> Dict[int, "Player"]:
+        return Player.player_list

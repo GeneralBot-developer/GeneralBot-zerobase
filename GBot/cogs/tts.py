@@ -96,11 +96,12 @@ class VoiceChannel:
             }
         }
 
-    def make_by_jtalk(self,
-                      text,
-                      filepath='voice_message',
-                      voicetype='mei',
-                      emotion='normal'):
+    def make_by_jtalk(
+            self,
+            text,
+            filepath='voice_message',
+            voicetype='mei',
+            emotion='normal'):
         htsvoice = {
             'mei': {
                 'normal': [
