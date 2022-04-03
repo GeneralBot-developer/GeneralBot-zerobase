@@ -96,11 +96,12 @@ class VoiceChannel:
             }
         }
 
-    def make_by_jtalk(self,
-                      text,
-                      filepath='voice_message',
-                      voicetype='mei',
-                      emotion='normal'):
+    def make_by_jtalk(
+            self,
+            text,
+            filepath='voice_message',
+            voicetype='mei',
+            emotion='normal'):
         htsvoice = {
             'mei': {
                 'normal': [
@@ -294,5 +295,5 @@ class Text_To_Speech(commands.Cog):
         await self.play_only(ctx)
 
 
-def setup(bot):
-    bot.add_cog(Text_To_Speech(bot))
+async def setup(bot):
+    return await bot.add_cog(Text_To_Speech(bot))

@@ -24,5 +24,5 @@ class ScreenShot(Cog):
         await ctx.send(file=File("GBot/data/screenshot.png"))
 
 
-def setup(bot):
-    return bot.add_cog(ScreenShot(bot))
+async def setup(bot):
+    return await bot.add_cog(ScreenShot(bot))

@@ -80,5 +80,5 @@ class moderation(Cog):
         await ctx.send(f"{user} を除外しました。")
 
 
-def setup(bot):
-    bot.add_cog(moderation(bot))
+async def setup(bot):
+    return await bot.add_cog(moderation(bot))

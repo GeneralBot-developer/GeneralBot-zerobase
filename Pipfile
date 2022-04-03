@@ -12,7 +12,7 @@ sqlalchemy = "*"
 python-dotenv = "*"
 sentry-sdk = "*"
 discord-ext-ui = "*"
-jishaku = "*"
+jishaku = {git = "https://github.com/Gorialis/jishaku"}
 alembic = "*"
 aiomysql = "*"
 pyppeteer = "*"

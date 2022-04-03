@@ -32,25 +32,24 @@ class GeneralBotCore(Bot):
         self.voice = {}
         self.voice: Dict[int, Set[VoiceState]]
         self.token = token
-        self.load_cogs()
 
     async def is_owner(self, user: discord.User):
         if user.id in team_id:
             return True
         return await super().is_owner(user)
 
-    def load_cogs(self):
+    async def load_cogs(self):
         cog_files = [
-            "Utils", "RoleKeeper", "screenshot", "music_player", "Calculation",
-            "tts", "virtual_money", "crypto", "auth", "wolf.__init__"
+            "Utils", "RoleKeeper", "screenshot", "music.__init__", "Calculation",
+            "tts", "virtual_money", "crypto", "auth", "wolf.__init__",
         ]
         for cog in cog_files:
-            super().load_extension(
+            await super().load_extension(
                 f"GBot.cogs.{cog[:-3] if cog.endswith('.py') else cog}"
             )
             LOG.info(f"{cog}のロード完了。")
         if self.jishaku:
-            super().load_extension("jishaku")
+            await super().load_extension("jishaku")
         LOG.info("全ファイルが正常に読み込まれました。")
 
     async def on_ready(self):
@@ -147,14 +146,13 @@ class GeneralBotCore(Bot):
                 traceback.TracebackException.from_exception(error).format()))
             await ctx.reply(embed=embed)
 
-    def run(self):
+    async def run(self):
         try:
-            self.loop.run_until_complete(self.start(self.token))
+            await self.start(self.token)
         except discord.LoginFailure:
             print("Discord Tokenが不正です")
         except KeyboardInterrupt:
-            self._connection._command_tree = None
             LOG.error("終了します")
-            self.loop.run_until_complete(self.close())
+            await self.close()
         else:
             traceback.print_exc()

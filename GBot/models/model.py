@@ -45,3 +45,11 @@ bbs = Table(
     Column("updated_at", DateTime(), nullable=True),
     Column("using_channels", JSON(), nullable=True),
 )
+
+playlist = Table(
+    "playlist",
+    meta,
+    Column("playlist_name", String(255), nullable=False, primary_key=True),
+    Column("author", BigInteger(), nullable=False),
+    Column("musics", JSON(), nullable=True)
+)

@@ -87,5 +87,5 @@ class Calculation(commands.Cog):
             await ctx.send("Illegal expression")
 
 
-def setup(bot):
-    bot.add_cog(Calculation(bot))
+async def setup(bot):
+    return await bot.add_cog(Calculation(bot))

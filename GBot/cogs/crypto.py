@@ -21,5 +21,5 @@ class Crypt_string(commands.Cog):
         await ctx.send(f"```{cryptocode.decrypt(text, password)}```")
 
 
-def setup(bot):
-    bot.add_cog(Crypt_string(bot))
+async def setup(bot):
+    return await bot.add_cog(Crypt_string(bot))

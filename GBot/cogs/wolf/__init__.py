@@ -111,8 +111,8 @@ class WerewolfGame(Cog, app_commands.Group):
             await self.show_vote(inter)
 
 
-def setup(bot: GeneralBotCore):
-    bot.add_cog(WerewolfGame(bot))
+async def setup(bot: GeneralBotCore):
+    await bot.add_cog(WerewolfGame(bot))
     bot.tree.add_command(
         WerewolfGame(bot),
         guild=Object(id=878265923709075486)
