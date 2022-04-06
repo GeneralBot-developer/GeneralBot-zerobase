@@ -2,8 +2,6 @@ from discord.ext import commands
 import discord
 from GBot.data.voice import VoiceState
 from GBot.core import GeneralBotCore
-import MeCab
-import json
 import os
 import subprocess
 from pydub import AudioSegment
@@ -12,82 +10,7 @@ from discord import Message
 import re
 
 
-class CommonModule:
-
-    def load_json(self, file, encoding):
-        with open(file, 'r', encoding=encoding) as f:
-            json_data = json.load(f)
-        return json_data
-
-
-class NLP:
-
-    def __init__(self):
-        self.cm = CommonModule()
-
-    def morphological_analysis(self, text, keyword='-Ochasen'):
-        words = []
-        tagger = MeCab.Tagger(keyword)
-        result = tagger.parse(text)
-        result = result.split('\n')
-        result = result[:-2]
-
-        for word in result:
-            temp = word.split('\t')
-            print(word)
-            word_info = {
-                'surface': temp[0],
-                'kana': temp[1],
-                'base': temp[2],
-                'pos': temp[3],
-                'conjugation': temp[4],
-                'form': temp[5]
-            }
-            words.append(word_info)
-        return words
-
-    def evaluate_pn_ja_wordlist(self, wordlist, word_pn_dictpath=None):
-        if word_pn_dictpath is None:
-            word_pn_dict = self.cm.load_json(file='./GBot/data/pn_ja.json',
-                                             encoding='cp932')
-        else:
-            word_pn_dict = self.cm.load_json(word_pn_dictpath)
-
-        pn_value = 0
-        for word in wordlist:
-            pn_value += self.evaluate_pn_ja_word(word, word_pn_dict)
-
-        return pn_value
-
-    def evaluate_pn_ja_word(self, word, word_pn_dict: dict):
-        if isinstance(word, dict):
-            word = word['base']
-        elif isinstance(word, str):
-            pass
-        else:
-            raise TypeError
-
-        if word in word_pn_dict.keys():
-            pn_value = float(word_pn_dict[word]['value'])
-            return pn_value
-        return 0
-
-    def analysis_emotion(self, text):
-        split_words = self.morphological_analysis(text, "-Ochasen")
-        pn_value = self.evaluate_pn_ja_wordlist(split_words)
-        if pn_value > 0.5:
-            emotion = 'happy'
-        elif pn_value < -1.0:
-            emotion = 'angry'
-        elif pn_value < -0.5:
-            emotion = 'sad'
-        else:
-            emotion = 'normal'
-        return emotion
-
-
-class VoiceChannel:
-
+class CreateVoice:
     def __init__(self):
         self.conf = {
             "voice_configs": {
@@ -107,67 +30,14 @@ class VoiceChannel:
                 'normal': [
                     '-m',
                     os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'mei/mei_normal.htsvoice')
-                ],
-                'angry': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'mei/mei_angry.htsvoice')
-                ],
-                'bashful': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'mei/mei_bashful.htsvoice')
-                ],
-                'happy': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'mei/mei_happy.htsvoice')
-                ],
-                'sad': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'mei/mei_sad.htsvoice')
-                ]
-            },
-            'm100': {
-                'normal': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'm100/nitech_jp_atr503_m001.htsvoice')
-                ]
-            },
-            'tohoku-f01': {
-                'normal': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'htsvoice-tohoku-f01-master/tohoku-f01-neutral.htsvoice'
+                        self.conf[
+                            'voice_configs'
+                        ]
+                        [
+                            'htsvoice_resource'
+                        ],
+                        'mei/mei_normal.htsvoice'
                     )
-                ],
-                'angry': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'htsvoice-tohoku-f01-master/tohoku-f01-angry.htsvoice')
-                ],
-                'happy': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'htsvoice-tohoku-f01-master/tohoku-f01-happy.htsvoice')
-                ],
-                'sad': [
-                    '-m',
-                    os.path.join(
-                        self.conf['voice_configs']['htsvoice_resource'],
-                        'htsvoice-tohoku-f01-master/tohoku-f01-sad.htsvoice')
                 ]
             }
         }
@@ -188,7 +58,6 @@ class VoiceChannel:
 
 
 class Text_To_Speech(commands.Cog):
-
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
         self.voice_processings = []
@@ -213,14 +82,12 @@ class Text_To_Speech(commands.Cog):
         return
 
     def create_voice(self, ctx: Context):
-        nlp = NLP()
-        vc = VoiceChannel()
+        vc = CreateVoice()
         text = self.voice_processings[-1]
         text = text[ctx.channel.id]
         text = self.remove_custom_emoji(text)
         text = self.urlAbb(text)
-        emotion = nlp.analysis_emotion(text)
-        voice_file = vc.make_by_jtalk(text, "tts_voice", emotion=emotion)
+        voice_file = vc.make_by_jtalk(text, "tts_voice")
         return discord.FFmpegPCMAudio(voice_file)
 
     async def play_only(self, ctx):

@@ -8,7 +8,7 @@ guild = Table(
     meta,
     Column("id", BigInteger(), nullable=False, primary_key=True),
     Column("prefix", String(8), nullable=False, server_default="g!"),
-    Column("auth", Boolean(), nullable=False),
+    Column("auth", Boolean(), nullable=False, server_default="False"),
     Column("auth_ch", BigInteger(), nullable=True),
     Column("auth_role", BigInteger(), nullable=True),
     Column("automoderation", Boolean(), nullable=False),

@@ -1,0 +1,25 @@
+version: "3.3"
+services:
+  dbot:
+    build:
+      context: ./src
+      dockerfile: dev.dockerfile
+    tty: true
+    working_dir: /bot/app
+    entrypoint: bash ./entrypoint.dev.sh
+    env_file: # この行と
+      - .env  # この行
+    volumes:
+      - ./src:/bot
+  mysql:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./db/sql:/docker-entrypoint-initdb.d
