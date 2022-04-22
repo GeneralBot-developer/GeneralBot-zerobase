@@ -148,8 +148,6 @@ class Text_To_Speech(commands.Cog):
             return
         if message.author.bot:
             return
-        if message.content.startswith(await self.bot.get_prefix(message)):
-            return
         if message.author.voice is None:
             return
         if self.bot.voice[message.guild.id] == VoiceState.NOT_PLAYED or \

@@ -40,8 +40,9 @@ class GeneralBotCore(Bot):
 
     async def load_cogs(self):
         cog_files = [
-            "Utils", "RoleKeeper", "screenshot", "music.__init__", "Calculation",
-            "tts", "virtual_money", "crypto", "auth", "wolf.__init__",
+            "Utils", "RoleKeeper", "screenshot", "music.__init__",
+            "Calculation", "tts", "virtual_money", "crypto", "auth",
+            "wolf.__init__", "trpg_dice"
         ]
         for cog in cog_files:
             await super().load_extension(

@@ -7,18 +7,17 @@ class DataBaseEntryPoint:
     async def __aenter__(self, loop=None):
         if loop is None:
             loop = asyncio.get_event_loop()
-        print("データベース接続開始")
         engine = await create_engine(
             user=os.environ["MYSQL_USER"],
             db=os.environ["MYSQL_DATABASE"],
             host="mysql",
+            port=3306,
             password=os.environ["MYSQL_PASSWORD"],
             charset="utf8",
             autocommit=True,
             loop=loop
         )
         self._connection = await engine.acquire()
-        print("データベース接続完了")
         return self
 
     async def __aexit__(self, *args, **kwargs):

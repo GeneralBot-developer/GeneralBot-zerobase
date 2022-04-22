@@ -1,5 +1,4 @@
 from discord.ext.commands import Cog
-from sqlalchemy import desc
 from GBot.core import GeneralBotCore
 from discord import app_commands, Object, Interaction, ui, Embed, Color
 from .Game import SessionManager
@@ -119,10 +118,9 @@ async def setup(bot: GeneralBotCore):
     )
 
 
-def teardown(bot: GeneralBotCore):
-    bot.tree.remove_command("werewwolf", guild=Object(id=878265923709075486))
+async def teardown(bot: GeneralBotCore):
     bot.tree.remove_command(
         WerewolfGame(bot),
         guild=Object(id=878265923709075486)
     )
-    bot.remove_cog(WerewolfGame(bot))
+    await bot.remove_cog(WerewolfGame(bot))

@@ -1,5 +1,21 @@
 version: "3.3"
 services:
+  mysql:
+    image: mysql:8.0
+    restart: always
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    env_file:
+      - .env
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./db/sql:/docker-entrypoint-initdb.d
+    networks:
+      - app-net
+
   dbot:
     build:
       context: ./src
@@ -11,15 +27,10 @@ services:
       - .env  # この行
     volumes:
       - ./src:/bot
-  mysql:
-    image: mysql:8.0
-    restart: always
-    ports:
-      - "3306:3306"
-    env_file:
-      - .env
-    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
-    volumes:
-      - ./db/data:/var/lib/mysql
-      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
-      - ./db/sql:/docker-entrypoint-initdb.d
+    depends_on:
+      - mysql
+    networks:
+      - app-net
+networks:
+  app-net:
+    driver: bridge

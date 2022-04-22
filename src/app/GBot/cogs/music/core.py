@@ -1,9 +1,6 @@
 import youtube_dl
 import discord
 import asyncio
-from typing import Dict, List
-import random
-from discord.ext.commands import Context
 from discord.ext import commands
 
 # Suppress noise about console usage from errors
@@ -75,6 +72,25 @@ class AudioQueue(asyncio.Queue):
         self._queue.clear()
 
 
+class CommonModules:
+    def _convert_m_s(self, time):
+        m, s = divmod(time, 60)
+        return f'{m:02d}:{s:02d}'
+
+    @classmethod
+    def make_embed(cls, data: YTDLSource):
+        cls = cls()
+        embed = discord.Embed(
+            title=data.title,
+            url=data.url,
+            description=f'{data.channel}',
+            color=0x00ff00
+        )
+        embed.set_thumbnail(url=data.thumbnail)
+        embed.set_footer(text=f'Duration: {cls._convert_m_s(data.duration)}')
+        return embed
+
+
 class AudioStatus:
     def __init__(self, ctx: commands.Context, vc: discord.VoiceClient):
         self.vc: discord.VoiceClient = vc
@@ -83,8 +99,8 @@ class AudioStatus:
         self.playing = asyncio.Event()
         asyncio.create_task(self.playing_task())
 
-    async def add_audio(self, title, path):
-        await self.queue.put([title, path])
+    async def add_audio(self, title, data):
+        await self.queue.put([title, data])
 
     def get_list(self):
         return self.queue.to_list()
@@ -93,15 +109,15 @@ class AudioStatus:
         while True:
             self.playing.clear()
             try:
-                title, path = await asyncio.wait_for(
+                data = await asyncio.wait_for(
                     self.queue.get(),
                     timeout=180
                 )
             except asyncio.TimeoutError:
                 asyncio.create_task(self.leave())
-            src = discord.FFmpegPCMAudio(path)
-            self.vc.play(src, after=self.play_next)
-            await self.ctx.send(f'{title}を再生します...')
+            self.vc.play(data[1], after=self.play_next)
+            embed = CommonModules.make_embed(data[1])
+            await self.ctx.send(embed=embed)
             await self.playing.wait()
 
     def play_next(self, err=None):

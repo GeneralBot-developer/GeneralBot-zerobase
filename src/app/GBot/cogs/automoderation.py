@@ -1,6 +1,5 @@
 import discord
-from discord.ext.commands import Cog, command, Context, has_guild_permissions, group
-import asyncio
+from discord.ext.commands import Cog, command, has_guild_permissions, group
 from GBot.CRUD.guild import Guild
 
 

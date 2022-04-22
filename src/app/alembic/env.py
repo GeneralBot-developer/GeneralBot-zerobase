@@ -30,6 +30,9 @@ target_metadata = meta
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+section = config.config_ini_section
+config.set_section_option(section, "MYSQL_USER", os.environ.get("MYSQL_USER"))
+config.set_section_option(section, "MYSQL_PASSWORD", os.environ.get("MYSQL_PASSWORD"))
 
 
 def run_migrations_offline():

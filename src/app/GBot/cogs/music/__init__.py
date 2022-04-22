@@ -2,34 +2,59 @@
 from GBot.core import GeneralBotCore
 from GBot.data.voice import VoiceState
 from discord.ext import commands
-from discord.ext.commands import Context
-from .core import AudioStatus
+import discord
+from .core import AudioStatus, YTDLSource
 from typing import Dict
 from . import core
 import importlib
 
 
 class DiscordMusicPlayer(commands.Cog):
+
     def __init__(self, bot: GeneralBotCore):
         self.bot = bot
         self.audio_statuses: Dict[int, AudioStatus] = {}
 
-    @commands.command()
+    @commands.group()
+    async def music(self, ctx):
+        if ctx.invoked_subcommand is None:
+            embed = discord.Embed(
+                title="エラー",
+                description="コマンドが指定されていません。",
+                color=0xFF0000
+            )
+            embed.add_field(name="指定可能なコマンド",
+                            value="\n".join([
+                                f"```{command.name}```"
+                                for command in self.music.walk_commands()
+                                if isinstance(command, commands.Command)
+                            ]),
+                            inline=False)
+
+    @music.command()
     async def join(self, ctx: commands.Context):
         # VoiceChannel未参加
         if not ctx.author.voice or not ctx.author.voice.channel:
             return await ctx.send('先にボイスチャンネルに参加してください')
         vc = await ctx.author.voice.channel.connect()
+        self.bot.voice[ctx.guild.id] = VoiceState.MUSIC
         self.audio_statuses[ctx.guild.id] = AudioStatus(ctx, vc)
 
-    @commands.command()
+    @music.command()
     async def play(self, ctx: commands.Context, *, title: str = ''):
         status = self.audio_statuses.get(ctx.guild.id)
         if status is None:
             await ctx.invoke(self.join)
             status = self.audio_statuses[ctx.guild.id]
+        data = await YTDLSource.from_url(
+            title,
+            loop=self.bot.loop,
+            stream=True
+        )
+        await status.add_audio(data.title, data)
+        await ctx.reply("追加しました。")
 
-    @commands.command()
+    @music.command()
     async def stop(self, ctx: commands.Context):
         status = self.audio_statuses.get(ctx.guild.id)
         if status is None:
@@ -39,15 +64,16 @@ class DiscordMusicPlayer(commands.Cog):
         await status.stop()
         await ctx.send('停止しました')
 
-    @commands.command()
+    @music.command()
     async def leave(self, ctx: commands.Context):
         status = self.audio_statuses.get(ctx.guild.id)
         if status is None:
             return await ctx.send('ボイスチャンネルにまだ未参加です')
         await status.leave()
+        self.bot.voice[ctx.guild.id] = VoiceState.NOT_PLAYED
         del self.audio_statuses[ctx.guild.id]
 
-    @commands.command()
+    @music.command()
     async def queue(self, ctx: commands.Context):
         status = self.audio_statuses.get(ctx.guild.id)
         if status is None:
