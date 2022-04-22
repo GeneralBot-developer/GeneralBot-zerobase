@@ -32,9 +32,9 @@ class Guild(CRUDBase):
         return self
 
     @classmethod
-    async def create(cls, guild_id):
-        q = model.guild.insert(None).values(id=guild_id)
-        guild = cls(guild_id)
+    async def create(cls, **kwargs):
+        q = model.guild.insert(None).values(**kwargs)
+        guild = cls(kwargs["id"])
         await cls.execute(q)
         return guild
 

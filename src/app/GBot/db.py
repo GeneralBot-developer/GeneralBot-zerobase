@@ -8,11 +8,11 @@ class DataBaseEntryPoint:
         if loop is None:
             loop = asyncio.get_event_loop()
         engine = await create_engine(
-            user=os.environ["DB_USER"],
-            db=os.environ["DB_USER"],
-            host=os.environ["DB_HOST"],
+            user=os.environ["MYSQL_USER"],
+            db=os.environ["MYSQL_DATABASE"],
+            host="mysql",
             port=3306,
-            password=os.environ["DB_PASSWORD"],
+            password=os.environ["MYSQL_PASSWORD"],
             charset="utf8",
             autocommit=True,
             loop=loop

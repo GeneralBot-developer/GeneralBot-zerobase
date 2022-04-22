@@ -3,6 +3,7 @@ from discord.ext.commands import Command, Cog
 import discord
 import Levenshtein
 from typing import List, Optional, Dict
+from discord import Embed
 
 
 class HelpCommand(commands.HelpCommand):
@@ -78,8 +79,11 @@ class HelpCommand(commands.HelpCommand):
         )
         return embed
 
-    async def send_error_message(self, error):
-        await self.get_destination().send(embed=error)
+    async def send_error_message(self, error: Embed):
+        if isinstance(error, str):
+            await self.get_destination().send(f"```{error}```")
+        else:
+            await self.get_destination().send(embed=error)
 
     async def send_group_help(self, group):
         embed = discord.Embed(

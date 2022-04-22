@@ -8,10 +8,10 @@ guild = Table(
     meta,
     Column("id", BigInteger(), nullable=False, primary_key=True),
     Column("prefix", String(8), nullable=False, server_default="g!"),
-    Column("auth", Boolean(), nullable=False),
+    Column("auth", Boolean(), nullable=True),
     Column("auth_ch", BigInteger(), nullable=True),
     Column("auth_role", BigInteger(), nullable=True),
-    Column("automoderation", Boolean(), nullable=False),
+    Column("automoderation", Boolean(), nullable=True),
     Column("ignore_channels", JSON(), nullable=True),
     Column("ignore_roles", JSON(), nullable=True),
     Column("ignore_users", JSON(), nullable=True),
@@ -33,17 +33,6 @@ auth = Table(
     meta,
     Column("user_id", BigInteger(), nullable=False, primary_key=True),
     Column("passcord", String(4), nullable=True)
-)
-
-bbs = Table(
-    "bbs",
-    meta,
-    Column("title", String(255), nullable=False),
-    Column("author", BigInteger(), nullable=False, primary_key=True),
-    Column("content", String(1024), nullable=False),
-    Column("created_at", DateTime(), nullable=False),
-    Column("updated_at", DateTime(), nullable=True),
-    Column("using_channels", JSON(), nullable=True),
 )
 
 playlist = Table(

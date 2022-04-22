@@ -1,9 +1,5 @@
-#!/bin/sh
-#code1
+#!/bin/bash
+cmd="sudo docker-compose -f docker-compose.$1.yml -p $1 ${@:2}"
 set -eu
-git pull origin master
-pipenv install
-alembic -c alembic.prod.ini upgrade head
-alembic -c ./alembic.prod.ini revision --autogenerate
-alembic -c alembic.prod.ini upgrade head
-python3 -m GBot
+echo $cmd
+eval $cmd

@@ -40,8 +40,9 @@ class GeneralBotCore(Bot):
 
     async def load_cogs(self):
         cog_files = [
-            "Utils", "RoleKeeper", "screenshot", "music.__init__", "Calculation",
-            "tts", "virtual_money", "crypto", "auth", "wolf.__init__",
+            "Utils", "RoleKeeper", "screenshot", "music.__init__",
+            "Calculation", "tts", "virtual_money", "crypto", "auth",
+            "wolf.__init__", "trpg_dice"
         ]
         for cog in cog_files:
             await super().load_extension(
@@ -78,7 +79,10 @@ class GeneralBotCore(Bot):
                 return guild.prefix
         else:
             LOG.info("該当するサーバーがなかったので新たに作成します。")
-            guild = await Guild.create(message.guild.id)
+            guild = await Guild.create(
+                id=message.guild.id,
+                auth=True
+            )
             guild = await guild.get()
             print(f"サーバー:{message.guild.name}")
             print(f"接頭文字:{guild.prefix}")
