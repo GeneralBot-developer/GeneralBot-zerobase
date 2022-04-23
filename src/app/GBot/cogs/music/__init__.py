@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from GBot.core import GeneralBotCore
-from GBot.data.voice import VoiceState
+from GBot.data.voice import VoiceState, VoiceManager
 from discord.ext import commands
 import discord
 from .core import AudioStatus, YTDLSource
@@ -36,8 +36,11 @@ class DiscordMusicPlayer(commands.Cog):
         # VoiceChannel未参加
         if not ctx.author.voice or not ctx.author.voice.channel:
             return await ctx.send('先にボイスチャンネルに参加してください')
+        voice = VoiceManager(ctx.guild.id).get()
+        if voice.state is not VoiceState.NOT_PLAYED:
+            return await ctx.send('使用中です。')
         vc = await ctx.author.voice.channel.connect()
-        self.bot.voice[ctx.guild.id] = VoiceState.MUSIC
+        VoiceManager(ctx.guild.id).get().set(VoiceState.MUSIC)
         self.audio_statuses[ctx.guild.id] = AudioStatus(ctx, vc)
 
     @music.command()
@@ -70,7 +73,7 @@ class DiscordMusicPlayer(commands.Cog):
         if status is None:
             return await ctx.send('ボイスチャンネルにまだ未参加です')
         await status.leave()
-        self.bot.voice[ctx.guild.id] = VoiceState.NOT_PLAYED
+        VoiceManager(ctx.guild.id).get().set(VoiceState.NOT_PLAYED)
         del self.audio_statuses[ctx.guild.id]
 
     @music.command()
