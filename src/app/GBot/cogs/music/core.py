@@ -2,6 +2,7 @@ import youtube_dl
 import discord
 import asyncio
 from discord.ext import commands
+from typing import Union
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -38,24 +39,41 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.channel: str = data.get('channel')
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
-        print(url)
+    async def from_url(cls, url, *, loop=None, stream=True) -> Union[list, 'YTDLSource']:
+        data, filename = await cls._from_url(url, loop=loop, stream=stream)
+        if isinstance(data, list):
+            datas = []
+            for index, data in enumerate(data):
+                filename = data.get('url')
+                datas.append(
+                    cls(
+                        discord.FFmpegPCMAudio(
+                            filename,
+                            **ffmpeg_options
+                        ),
+                        data=data
+                    )
+                )
+            return datas
+        else:
+            return cls(
+                discord.FFmpegPCMAudio(
+                    filename,
+                    **ffmpeg_options
+                ),
+                data=data
+            )
+
+    @staticmethod
+    async def _from_url(url, *, loop=None, stream=False) -> Union[list, 'YTDLSource']:
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(
+        data: Union[dict, "YTDLSource"] = await loop.run_in_executor(
             None, lambda: ytdl.extract_info(url, download=not stream))
 
         if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
-
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(
-            discord.FFmpegPCMAudio(
-                filename,
-                **ffmpeg_options
-            ),
-            data=data
-        )
+            return data['entries']
+        filename: str = data['url'] if stream else ytdl.prepare_filename(data)
+        return data, filename
 
 
 class AudioQueue(asyncio.Queue):
