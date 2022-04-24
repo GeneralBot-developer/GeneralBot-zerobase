@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from GBot.core import GeneralBotCore
+from core import GeneralBotCore
 import discord
 import sentry_sdk
 import asyncio
