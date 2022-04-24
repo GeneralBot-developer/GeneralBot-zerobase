@@ -1,6 +1,8 @@
 import os
+import sys
 from dotenv import load_dotenv
-from .core import GeneralBotCore
+sys.path.append(sys.path.append("../GBot"))
+from GBot.core import GeneralBotCore
 import discord
 import sentry_sdk
 import asyncio
