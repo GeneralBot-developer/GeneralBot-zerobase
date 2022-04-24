@@ -9,6 +9,7 @@ from discord.ext.commands import (
     Cog, command, group,
     has_permissions, is_owner, Context
 )
+import subprocess
 from discord.ext.commands.errors import (
     MissingPermissions,
     MissingRequiredArgument)
@@ -47,16 +48,14 @@ class BotUtility(Cog):
         if ctx.invoked_subcommand is None:
             return
 
-    @is_owner()
-    @moderation.command(help="botを再起動します。")
-    async def restart(self, ctx):
-        await ctx.send("Restarting...")
-        python = sys.executable
-        os.execl(python, python, *sys.argv)
-
 
 class PrefixModal(ui.Modal, title="Prefixを変更"):
-    prefix = ui.TextInput(label="新しいPrefix名", default="g!", max_length=8, required=True)
+    prefix = ui.TextInput(
+        label="新しいPrefix名",
+        default="g!",
+        max_length=8,
+        required=True
+    )
 
     async def on_submit(self, inter: discord.Interaction):
         if str(inter.guild.owner.id) == str(inter.user.id):
