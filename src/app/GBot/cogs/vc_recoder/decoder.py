@@ -5,6 +5,7 @@ import ctypes
 import os
 import logging
 import struct
+from typing import Union
 
 log = logging.getLogger(__name__)
 
@@ -12,7 +13,15 @@ log = logging.getLogger(__name__)
 _lib = None
 
 
-def libopus_loader(name):
+def libopus_loader(name: str) -> ctypes.CDLL:
+    """渡されたライブラリ名を持つCDLLオブジェクトを返す。
+
+    Args:
+        name (str): 読み込みたいライブラリ名
+
+    Returns:
+        ctypes.CDLL: 読み込まれたcdllライブラリの実体
+    """
     # create the library...
     lib = ctypes.cdll.LoadLibrary(name)
 
@@ -37,7 +46,12 @@ def libopus_loader(name):
     return lib
 
 
-def _load_default():
+def _load_default() -> Union[ctypes.CDLL, None]:
+    """libopusをロードしてCDLLオブジェクトを返す。
+
+    Returns:
+        Union[ctypes.CDLL, None]: libopusを読み込む。もしも読み込みに失敗したらNoneを返す。
+    """
     global _lib
     try:
         if sys.platform == 'win32':
@@ -59,7 +73,12 @@ def _load_default():
     return _lib is not None
 
 
-def is_loaded():
+def is_loaded() -> bool:
+    """libopusがロードされているかどうかを返す。
+
+    Returns:
+        bool: libopusがロードされているかどうか
+    """
     global _lib
     return _lib is not None
 
@@ -69,7 +88,19 @@ class Decoder(DiscordDecoder):
     def packet_get_nb_channels(data: bytes) -> int:
         return 2
 
-    def decode_float(self, data, *, fec=False):
+    def decode_float(self, data: bytes, *, fec: bool=False) -> float:
+        """ dataでopusのデコードしてfloat型のデータを返す。
+
+        Args:
+            data (_type_): opusのデコードデータ
+            fec (bool, optional): fecを使うかどうか。デフォルトはFalse。
+
+        Raises:
+            OpusError: opusのエラーが発生した場合に発生
+
+        Returns:
+            float: opusのデコードデータ
+        """
         if not is_loaded():
             _load_default()
         if data is None and fec:

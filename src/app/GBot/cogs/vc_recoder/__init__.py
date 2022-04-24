@@ -4,7 +4,7 @@ from GBot.data.voice import VoiceManager, VoiceState
 from typing import Dict
 import discord
 from GBot.core import GeneralBotCore
-import asyncio
+from discord.ext.commands import Context
 
 
 class Voice_Recoder(commands.Cog):
@@ -13,12 +13,12 @@ class Voice_Recoder(commands.Cog):
         self.audio_status: Dict[int, MyVoiceClient] = {}
 
     @commands.group(name="voice_recoder", aliases=["vcr", "voice_rec", "voice_record"])
-    async def voice_recoder(self, ctx):
+    async def voice_recoder(self, ctx) -> None:
         if ctx.invoked_subcommand is None:
             return
 
     @voice_recoder.command(name="join", aliases=["j"])
-    async def join(self, ctx):
+    async def join(self, ctx: Context) -> None:
         if ctx.author.voice is None:
             return await ctx.reply("ボイスチャンネルに参加してください。")
         elif VoiceManager(ctx.guild.id).get() is None:
@@ -30,8 +30,7 @@ class Voice_Recoder(commands.Cog):
         self.audio_status[ctx.guild.id] = vc
 
     @voice_recoder.command(name="start", aliases=["s"])
-    async def start(self, ctx: commands.Context, record_time: int):
-        loop = asyncio.get_event_loop()
+    async def start(self, ctx: commands.Context, record_time: int) -> None:
         if self.audio_status.get(ctx.guild.id) is None:
             return await ctx.reply("先にボイスチャンネルに参加してください。")
         vc: MyVoiceClient = self.audio_status[ctx.guild.id]
@@ -42,6 +41,15 @@ class Voice_Recoder(commands.Cog):
             filename="voice_recoder {}s".format(record_time)
         )
         await ctx.reply("録音を終了しました。", file=file)
+
+    @voice_recoder.command(name="leave", aliases=["l"])
+    async def leave(self, ctx) -> None:
+        if self.audio_status.get(ctx.guild.id) is None:
+            return await ctx.reply("先にボイスチャンネルに参加してください。")
+        vc: MyVoiceClient = self.audio_status[ctx.guild.id]
+        await vc.disconnect()
+        VoiceManager(ctx.guild.id).set(VoiceState.NOT_PLAYED)
+        await ctx.reply("ボイスチャンネルから退出しました。")
 
 
 async def setup(bot):

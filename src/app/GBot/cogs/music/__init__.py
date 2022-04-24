@@ -54,8 +54,11 @@ class DiscordMusicPlayer(commands.Cog):
             loop=self.bot.loop,
             stream=True
         )
+        if isinstance(data, list):
+            for d in data:
+                await status.add_audio(d.title, d)
         await status.add_audio(data.title, data)
-        await ctx.reply("追加しました。")
+        await ctx.reply()
 
     @music.command()
     async def stop(self, ctx: commands.Context):
