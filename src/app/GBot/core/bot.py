@@ -63,25 +63,20 @@ class GeneralBotCore(Bot):
 
     async def get_prefix(self, message: discord.Message):
         guild = await Guild(message.guild.id).get()
-        if guild:
-            if guild.id == 878265923709075486:
-                if self.user.id == 950745689749602364:
-                    print(f"サーバー:{message.guild.name}")
-                    print("接頭文字:gc!")
-                    return "gc!"
-                else:
-                    print(f"サーバー:{message.guild.name}")
-                    print(f"接頭文字:{guild.prefix}")
-                    return guild.prefix
-            else:
+        if message.guild.id == 878265923709075486:
+            if self.user.id == 950745689749602364:
                 print(f"サーバー:{message.guild.name}")
-                print(f"接頭文字:{guild.prefix}")
-                return guild.prefix
+                print("接頭文字:gc!")
+                return "gc!"
+        if guild:
+            print(f"サーバー:{message.guild.name}")
+            print(f"接頭文字:{guild.prefix}")
+            return guild.prefix
         else:
             LOG.info("該当するサーバーがなかったので新たに作成します。")
             guild = await Guild.create(
                 id=message.guild.id,
-                auth=True
+                auth=False
             )
             guild = await guild.get()
             print(f"サーバー:{message.guild.name}")
