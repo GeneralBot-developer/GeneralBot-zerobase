@@ -19,7 +19,7 @@ class Guild(CRUDBase):
     async def get(self) -> RowProxy:
         q = model.guild.select().where(self.guild_id == model.guild.c.id)
         result = await self.execute(q)
-        await result.fetchone()
+        return await result.fetchone()
 
     async def set(self, **kwargs):
         q = model.guild.update(None).where(
