@@ -1,7 +1,5 @@
 import os
-import sys
 from dotenv import load_dotenv
-sys.path.append(sys.path.append("../GBot"))
 from GBot.core import GeneralBotCore
 import discord
 import sentry_sdk

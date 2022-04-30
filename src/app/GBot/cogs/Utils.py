@@ -1,15 +1,11 @@
-import os
-import sys
-
 from GBot.CRUD.guild import Guild
 import discord
 from discord import app_commands, Object, Interaction, ui
 
 from discord.ext.commands import (
-    Cog, command, group,
-    has_permissions, is_owner, Context
+    Cog, command,
+    has_permissions, Context
 )
-import subprocess
 from discord.ext.commands.errors import (
     MissingPermissions,
     MissingRequiredArgument)
@@ -42,12 +38,6 @@ class BotUtility(Cog):
             return await ctx.send('引数は新しいPrefixを8文字以内で渡してください')
         raise error
 
-    @is_owner()
-    @group(aliases=["mod", "dev", "develop"], help="開発者コマンド")
-    async def moderation(self, ctx):
-        if ctx.invoked_subcommand is None:
-            return
-
 
 class PrefixModal(ui.Modal, title="Prefixを変更"):
     prefix = ui.TextInput(
@@ -61,7 +51,9 @@ class PrefixModal(ui.Modal, title="Prefixを変更"):
         if str(inter.guild.owner.id) == str(inter.user.id):
             guild = await Guild(inter.guild.id).get()
             await Guild(inter.guild.id).set(prefix=str(self.prefix))
-            await inter.response.send_message(f"Prefixを{guild.prefix}から{self.prefix}に変更しました")
+            await inter.response.send_message(
+                f"Prefixを{guild.prefix}から{self.prefix}に変更しました"
+            )
         else:
             await inter.response.send_message("管理者のみが実行可能です")
 
