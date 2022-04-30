@@ -38,6 +38,8 @@ class DiscordMusicPlayer(commands.Cog):
         if not ctx.author.voice or not ctx.author.voice.channel:
             return await ctx.send('先にボイスチャンネルに参加してください')
         voice = VoiceManager(ctx.guild.id).get()
+        if not voice:
+            voice = VoiceManager.create(ctx.guild.id).get()
         if voice.state is not VoiceState.NOT_PLAYED:
             return await ctx.send('使用中です。')
         vc = await ctx.author.voice.channel.connect()
