@@ -15,8 +15,8 @@ class DiscordMusicPlayer(commands.Cog):
         self.bot = bot
         self.audio_statuses: Dict[int, AudioStatus] = {}
 
-    @commands.group()
-    async def music(self, ctx):
+    @commands.hybrid_group(name='music', aliases=['音楽'])
+    async def music(self, ctx) -> None:
         if ctx.invoked_subcommand is None:
             embed = discord.Embed(
                 title="エラー",
@@ -30,6 +30,7 @@ class DiscordMusicPlayer(commands.Cog):
                                 if isinstance(command, commands.Command)
                             ]),
                             inline=False)
+            await ctx.send(embed=embed)
 
     @music.command()
     async def join(self, ctx: commands.Context):
@@ -44,13 +45,13 @@ class DiscordMusicPlayer(commands.Cog):
         self.audio_statuses[ctx.guild.id] = AudioStatus(ctx, vc)
 
     @music.command()
-    async def play(self, ctx: commands.Context, *, title: str = ''):
+    async def play(self, ctx: commands.Context, *, url: str):
         status = self.audio_statuses.get(ctx.guild.id)
         if status is None:
             await ctx.invoke(self.join)
             status = self.audio_statuses[ctx.guild.id]
         data = await YTDLSource.from_url(
-            title,
+            url,
             loop=self.bot.loop,
             stream=True
         )
@@ -58,7 +59,6 @@ class DiscordMusicPlayer(commands.Cog):
             for d in data:
                 await status.add_audio(d.title, d)
         await status.add_audio(data.title, data)
-        await ctx.reply()
 
     @music.command()
     async def stop(self, ctx: commands.Context):
@@ -68,7 +68,7 @@ class DiscordMusicPlayer(commands.Cog):
         if not status.is_playing:
             return await ctx.send('既に停止しています')
         await status.stop()
-        await ctx.send('停止しました')
+        await ctx.reply('停止しました')
 
     @music.command()
     async def leave(self, ctx: commands.Context):
@@ -78,6 +78,7 @@ class DiscordMusicPlayer(commands.Cog):
         await status.leave()
         VoiceManager(ctx.guild.id).get().set(VoiceState.NOT_PLAYED)
         del self.audio_statuses[ctx.guild.id]
+        await ctx.reply('退出しました')
 
     @music.command()
     async def queue(self, ctx: commands.Context):

@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, String, MetaData, BigInteger, JSON, Boolean, Integer, DateTime
+from sqlalchemy import Table, Column, String, MetaData, BigInteger, JSON, Boolean
 
 meta = MetaData()
 
@@ -11,11 +11,7 @@ guild = Table(
     Column("auth", Boolean(), nullable=True),
     Column("auth_ch", BigInteger(), nullable=True),
     Column("auth_role", BigInteger(), nullable=True),
-    Column("automoderation", Boolean(), nullable=True),
-    Column("ignore_channels", JSON(), nullable=True),
-    Column("ignore_roles", JSON(), nullable=True),
-    Column("ignore_users", JSON(), nullable=True),
-    Column("message_delete_limit", Integer(), nullable=False, server_default="5"),
+
 )
 
 VirtualMoney = Table(
@@ -26,19 +22,4 @@ VirtualMoney = Table(
     Column("unit", String(3), nullable=False, server_default="JPY"),
     Column("members", JSON(), nullable=True),
     Column("stores", JSON(), nullable=True),
-)
-
-auth = Table(
-    "auth",
-    meta,
-    Column("user_id", BigInteger(), nullable=False, primary_key=True),
-    Column("passcord", String(4), nullable=True)
-)
-
-playlist = Table(
-    "playlist",
-    meta,
-    Column("playlist_name", String(255), nullable=False, primary_key=True),
-    Column("author", BigInteger(), nullable=False),
-    Column("musics", JSON(), nullable=True)
 )

@@ -1,13 +1,16 @@
 import os
 import asyncio
-from aiomysql.sa import create_engine
+from aiomysql.sa import create_engine, Engine, SAConnection
+from aiomysql.sa.result import ResultProxy
 
 
 class DataBaseEntryPoint:
-    async def __aenter__(self, loop=None):
+    _connection: SAConnection = None
+
+    async def __aenter__(self, loop=None) -> "DataBaseEntryPoint":
         if loop is None:
             loop = asyncio.get_event_loop()
-        engine = await create_engine(
+        engine: Engine = await create_engine(
             user=os.environ["MYSQL_USER"],
             db=os.environ["MYSQL_DATABASE"],
             host="mysql",
@@ -17,11 +20,11 @@ class DataBaseEntryPoint:
             autocommit=True,
             loop=loop
         )
-        self._connection = await engine.acquire()
+        self._connection: SAConnection = await engine.acquire()
         return self
 
-    async def __aexit__(self, *args, **kwargs):
+    async def __aexit__(self, *args, **kwargs) -> None:
         await self._connection.close()
 
-    async def execute(self, query, *args, **kwargs):
+    async def execute(self, query, *args, **kwargs) -> ResultProxy:
         return await self._connection.execute(query, *args, **kwargs)

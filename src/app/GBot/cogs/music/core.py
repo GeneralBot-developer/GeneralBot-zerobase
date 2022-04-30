@@ -2,7 +2,7 @@ import youtube_dl
 import discord
 import asyncio
 from discord.ext import commands
-from typing import Union
+from typing import Union, List
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -39,7 +39,13 @@ class YTDLSource(discord.PCMVolumeTransformer):
         self.channel: str = data.get('channel')
 
     @classmethod
-    async def from_url(cls, url, *, loop=None, stream=True) -> Union[list, 'YTDLSource']:
+    async def from_url(
+            cls,
+            url,
+            *,
+            loop=None,
+            stream=True
+    ) -> Union[List['YTDLSource'], 'YTDLSource']:
         data, filename = await cls._from_url(url, loop=loop, stream=stream)
         if isinstance(data, list):
             datas = []
