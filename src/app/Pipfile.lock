@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f2a36fb3c464d2fd2f6d6ef8f47b67de6a1791e9202baaf7a1a216bd73d6035e"
+            "sha256": "0a611bfe43103bd27aa36ef883806f3fba9fb9bfb6c4955cd7d1512e94fa5dd7"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -197,7 +197,7 @@
                 "sha256:d767faf537a9ea774e8408ba15a0f1dc734f06857c2d28bdf4258a63b5885f42",
                 "sha256:dd316270757d77f384c97e336588267e7942c1f1492a3a2e07b9a80dca027538"
             ],
-            "markers": "python_version < '4' and python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5' and python_version < '4'",
             "version": "==0.9.5"
         },
         "captcha": {
@@ -275,7 +275,7 @@
                 "sha256:2857e29ff0d34db842cd7ca3230549d1a697f96ee6d3fb071cfa6c7393832597",
                 "sha256:6881edbebdb17b39b4eaaa821b438bf6eddffb4468cf344f09f89def34a8b1df"
             ],
-            "markers": "python_full_version >= '3.5.0'",
+            "markers": "python_version >= '3.5'",
             "version": "==2.0.12"
         },
         "click": {
@@ -307,13 +307,21 @@
                 "voice"
             ],
             "git": "https://github.com/Rapptz/discord.py",
-            "ref": "141c31e50fab85a977fcfced34cd222d93d97625"
+            "ref": "14e83dff0e46a4e30f7d2fb25c1527e631f973af"
         },
         "discord.py": {
             "extras": [
                 "voice"
             ],
             "git": "https://github.com/Rapptz/discord.py"
+        },
+        "discord.py-pagination": {
+            "hashes": [
+                "sha256:35e012e046b442a2ae433d5cf25769ed92ecc402883b009beacda60ac6cd3ca2",
+                "sha256:f439d9c7b3b23557303d83827268612ea9df581964e8a32fecf7c5e2e5855ce6"
+            ],
+            "index": "pypi",
+            "version": "==0.0.3"
         },
         "flake8": {
             "hashes": [

@@ -2,7 +2,8 @@ import youtube_dl
 import discord
 import asyncio
 from discord.ext import commands
-from typing import Union, List
+from typing import Union, List, Optional
+import random
 
 # Suppress noise about console usage from errors
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -49,7 +50,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data, filename = await cls._from_url(url, loop=loop, stream=stream)
         if isinstance(data, list):
             datas = []
-            for index, data in enumerate(data):
+            for data in data:
                 filename = data.get('url')
                 datas.append(
                     cls(
@@ -77,7 +78,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
             None, lambda: ytdl.extract_info(url, download=not stream))
 
         if 'entries' in data:
-            return data['entries']
+            return data['entries'], None
         filename: str = data['url'] if stream else ytdl.prepare_filename(data)
         return data, filename
 
@@ -95,14 +96,17 @@ class AudioQueue(asyncio.Queue):
     def reset(self):
         self._queue.clear()
 
+    def shuffle(self):
+        random.shuffle(self._queue)
+
 
 class CommonModules:
-    def _convert_m_s(self, time):
+    def _convert_m_s(self, time) -> str:
         m, s = divmod(time, 60)
         return f'{m:02d}:{s:02d}'
 
     @classmethod
-    def make_embed(cls, data: YTDLSource):
+    def make_embed(cls, data: YTDLSource) -> discord.Embed:
         cls = cls()
         embed = discord.Embed(
             title=data.title,
@@ -126,10 +130,10 @@ class AudioStatus:
     async def add_audio(self, title, data):
         await self.queue.put([title, data])
 
-    def get_list(self):
+    def get_list(self) -> List[str]:
         return self.queue.to_list()
 
-    async def playing_task(self):
+    async def playing_task(self) -> None:
         while True:
             self.playing.clear()
             try:
@@ -144,18 +148,39 @@ class AudioStatus:
             await self.ctx.send(embed=embed)
             await self.playing.wait()
 
-    def play_next(self, err=None):
+    def play_next(self, err=None) -> None:
         self.playing.set()
 
-    async def leave(self):
+    async def leave(self) -> None:
         self.queue.reset()
         if self.vc:
             await self.vc.disconnect()
             self.vc = None
 
     @property
-    def is_playing(self):
+    def is_playing(self) -> bool:
         return self.vc.is_playing()
 
-    def stop(self):
+    def get_now_playing(self) -> Optional[str]:
+        return self.queue.get()[0]
+
+    def stop(self) -> None:
         self.vc.stop()
+
+    def skip(self) -> None:
+        self.vc.stop()
+
+    def remove(self, index: int) -> None:
+        self.queue.remove(index)
+
+    def set_volume(self, volume: float) -> None:
+        self.vc.source.volume = volume
+
+    def shuffle(self) -> None:
+        self.queue.shuffle()
+
+    def set_repeat(self, repeat: bool) -> None:
+        self.vc.source.repeat = repeat
+
+    def set_loop(self, loop: bool) -> None:
+        self.vc.source.loop = loop

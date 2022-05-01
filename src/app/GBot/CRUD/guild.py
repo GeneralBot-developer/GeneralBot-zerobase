@@ -1,7 +1,6 @@
 from GBot.models import model as model
 from GBot.db import DataBaseEntryPoint as DB
 from aiomysql.sa.result import RowProxy
-from collections.abc import Mapping
 
 
 class CRUDBase:

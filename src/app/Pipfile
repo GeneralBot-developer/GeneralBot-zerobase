@@ -25,6 +25,7 @@ pywatcher = "*"
 pandas = "*"
 google-api-python-client = "==1.9.3"
 jishaku = {git = "https://github.com/Gorialis/jishaku.git"}
+"discord.py-pagination" = "*"
 
 [dev-packages]
 alembic = "*"
